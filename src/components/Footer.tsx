@@ -22,8 +22,8 @@ export const Footer = () => {
         <div className="grid md:grid-cols-3 gap-10 mb-10">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <span className="h-9 w-9 rounded-lg bg-gradient-to-br from-cyan to-gold grid place-items-center font-display font-bold text-background">T</span>
-              <span className="font-display text-lg font-bold">Taha<span className="text-cyan">.</span></span>
+              <span className="h-9 w-9 rounded-lg bg-gradient-to-br from-cyan to-gold grid place-items-center font-display font-bold text-background">Z</span>
+              <span className="font-display text-lg font-bold">Zap<span className="text-cyan">.</span></span>
             </div>
             <p className="text-sm text-muted-foreground max-w-xs">{t.footer.tagline}</p>
           </div>
