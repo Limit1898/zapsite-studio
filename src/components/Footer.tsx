@@ -52,7 +52,7 @@ export const Footer = () => {
         </div>
 
         <div className="pt-8 border-t border-white/5 text-center text-xs text-muted-foreground">
-          © 2026 Taha — {t.footer.rights}
+          © 2026 Zap — {t.footer.rights}
         </div>
       </div>
     </footer>
