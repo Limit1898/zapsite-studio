@@ -1,9 +1,8 @@
 import { motion } from "framer-motion";
 import { ArrowDown, ArrowRight, Sparkles } from "lucide-react";
-import { Particles } from "./Particles";
+import { ZapBackground } from "./ZapBackground";
 import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
-import heroBg from "@/assets/hero-bg.jpg";
 
 export const Hero = () => {
   const { t } = useI18n();
@@ -14,10 +13,10 @@ export const Hero = () => {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
       <div className="absolute inset-0">
-        <img src={heroBg} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" width={1920} height={1280} />
+        <div className="absolute inset-0 bg-background" />
         <div className="absolute inset-0" style={{ background: "var(--gradient-hero)" }} />
-        <div className="absolute inset-0 bg-background/40" />
-        <Particles />
+        <ZapBackground />
+        <div className="absolute inset-0 bg-background/30 pointer-events-none" />
       </div>
 
       <div className="container-x relative z-10 px-6 md:px-10 pt-32 pb-20 w-full">
