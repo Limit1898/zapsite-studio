@@ -1,16 +1,52 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useRef, useState } from "react";
+import { Navbar } from "@/components/Navbar";
+import { Hero } from "@/components/Hero";
+import { WebsiteTypes } from "@/components/WebsiteTypes";
+import { Pricing } from "@/components/Pricing";
+import { Portfolio } from "@/components/Portfolio";
+import { Process } from "@/components/Process";
+import { Testimonials } from "@/components/Testimonials";
+import { Contact } from "@/components/Contact";
+import { Footer } from "@/components/Footer";
+import { I18nProvider, useI18n } from "@/lib/i18n";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+const Page = () => {
+  const { dir } = useI18n();
+  const pricingRef = useRef<HTMLElement>(null);
+  const [highlight, setHighlight] = useState<string | null>(null);
+
+  const selectPlan = (plan: string) => {
+    setHighlight(plan);
+    setTimeout(() => {
+      document.getElementById(`plan-${plan}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 50);
+    window.setTimeout(() => setHighlight(null), 2500);
+  };
+
+  const scrollContact = () =>
+    document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
+    <div dir={dir} className="min-h-screen bg-background text-foreground overflow-x-hidden">
+      <Navbar />
+      <main>
+        <Hero />
+        <WebsiteTypes onSelect={selectPlan} />
+        <Pricing ref={pricingRef} highlighted={highlight} onContact={scrollContact} />
+        <Portfolio />
+        <Process />
+        <Testimonials />
+        <Contact />
+      </main>
+      <Footer />
     </div>
   );
 };
 
-const Index = PlaceholderIndex;
+const Index = () => (
+  <I18nProvider>
+    <Page />
+  </I18nProvider>
+);
 
 export default Index;
