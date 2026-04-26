@@ -1,10 +1,11 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { translations, Lang } from "./translations";
 
+type T = (typeof translations)[Lang];
 type Ctx = {
   lang: Lang;
   setLang: (l: Lang) => void;
-  t: typeof translations.tr;
+  t: T;
   dir: "ltr" | "rtl";
 };
 
@@ -27,7 +28,7 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
   const setLang = (l: Lang) => setLangState(l);
 
   return (
-    <I18nContext.Provider value={{ lang, setLang, t: translations[lang], dir }}>
+    <I18nContext.Provider value={{ lang, setLang, t: translations[lang] as T, dir }}>
       {children}
     </I18nContext.Provider>
   );
