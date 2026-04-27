@@ -4,6 +4,7 @@ import { Globe, Menu, X } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import type { Lang } from "@/lib/translations";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/Logo";
 
 const langs: { code: Lang; label: string; flag: string }[] = [
   { code: "tr", label: "Türkçe", flag: "🇹🇷" },
@@ -42,11 +43,8 @@ export const Navbar = () => {
       }`}
     >
       <nav className="container-x flex items-center justify-between px-6 md:px-10">
-        <a href="#" className="flex items-center gap-2 group">
-          <span className="h-9 w-9 rounded-lg bg-gradient-to-br from-cyan to-gold grid place-items-center font-display font-bold text-background">
-            Z
-          </span>
-          <span className="font-display text-lg font-bold tracking-tight">Zap<span className="text-cyan">.</span></span>
+        <a href="#" className="group" aria-label="Zap home">
+          <Logo size="md" className="transition-transform group-hover:scale-105" />
         </a>
 
         <div className="hidden md:flex items-center gap-8">
