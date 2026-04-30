@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
-const EMAIL = "Tahajuju7@gmail.com";
+const EMAIL = "zap.site.studio@gmail.com";
 
 export const Contact = () => {
   const { t } = useI18n();
