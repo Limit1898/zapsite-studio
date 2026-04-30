@@ -8,8 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const EMAIL = "zap.site.studio@gmail.com";
+const SUCCESS_MSG = "✅ Teşekkürler! Mesajınız alındı, 24 saat içinde dönüş yapacağım. / Thank you! I will get back to you within 24 hours.";
+const ERROR_MSG = "❌ Bir hata oluştu. Lütfen tekrar deneyin. / Something went wrong. Please try again.";
 
 export const Contact = () => {
   const { t } = useI18n();
@@ -33,29 +36,36 @@ export const Contact = () => {
     if (errors[k]) setErrors((e) => ({ ...e, [k]: false }));
   };
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const r = schema.safeParse(form);
     if (!r.success) {
       const errs: Record<string, boolean> = {};
       r.error.issues.forEach((i) => (errs[i.path[0] as string] = true));
       setErrors(errs);
-      toast.error(t.contact.error);
+      toast.error(ERROR_MSG);
       return;
     }
     setSending(true);
     try {
-      const subject = encodeURIComponent(`Yeni Teklif Talebi — ${form.name}`);
-      const body = encodeURIComponent(
-        `Ad: ${form.name}\nE-posta: ${form.email}\nTelefon: ${form.phone}\nTür: ${form.type}\nBütçe: ${form.budget}\n\nAçıklama:\n${form.desc}`
-      );
-      window.location.href = `mailto:${EMAIL}?subject=${subject}&body=${body}`;
-      toast.success(t.contact.success);
+      const { data, error } = await supabase.functions.invoke("send-quote-request", {
+        body: {
+          full_name: form.name,
+          email: form.email,
+          phone: form.phone,
+          website_type: form.type,
+          budget_range: form.budget,
+          project_description: form.desc,
+        },
+      });
+      if (error || (data as any)?.error) throw error || new Error((data as any).error);
+      toast.success(SUCCESS_MSG, { duration: 6000 });
       setForm({ name: "", email: "", phone: "", type: "", budget: "", desc: "" });
-    } catch {
-      toast.error(t.contact.error);
+    } catch (err) {
+      console.error("Quote submission failed:", err);
+      toast.error(ERROR_MSG, { duration: 6000 });
     } finally {
-      setTimeout(() => setSending(false), 800);
+      setSending(false);
     }
   };
 
