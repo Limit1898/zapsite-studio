@@ -12,6 +12,7 @@ const BodySchema = z.object({
 });
 
 const TO_EMAIL = "zap.site.studio@gmail.com";
+const FROM_EMAIL = "Zap Site Studio <onboarding@resend.dev>";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -19,9 +20,33 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+    const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+
+    console.log("[send-quote-request] env check", {
+      hasSupabaseUrl: !!SUPABASE_URL,
+      hasServiceRole: !!SERVICE_ROLE,
+      hasResendKey: !!RESEND_API_KEY,
+    });
+
+    if (!RESEND_API_KEY) {
+      return new Response(JSON.stringify({ error: "Email service not configured (missing RESEND_API_KEY)" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (!SUPABASE_URL || !SERVICE_ROLE) {
+      return new Response(JSON.stringify({ error: "Database not configured" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const json = await req.json();
     const parsed = BodySchema.safeParse(json);
     if (!parsed.success) {
+      console.error("[send-quote-request] validation failed:", parsed.error.flatten().fieldErrors);
       return new Response(
         JSON.stringify({ error: "Invalid input", details: parsed.error.flatten().fieldErrors }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -30,30 +55,18 @@ Deno.serve(async (req) => {
     const data = parsed.data;
 
     // Save to DB
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
+    const supabase = createClient(SUPABASE_URL, SERVICE_ROLE);
     const { error: dbError } = await supabase.from("quote_requests").insert(data);
     if (dbError) {
-      console.error("DB insert error:", dbError);
-      return new Response(JSON.stringify({ error: "Failed to save submission" }), {
+      console.error("[send-quote-request] DB insert error:", dbError);
+      return new Response(JSON.stringify({ error: "Failed to save submission", details: dbError.message }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    console.log("[send-quote-request] DB insert OK");
 
-    // Send email via Resend
-    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!RESEND_API_KEY || !LOVABLE_API_KEY) {
-      console.error("Missing API keys");
-      return new Response(JSON.stringify({ error: "Email service not configured" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
+    // Send email via Resend (direct API)
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background:#0a0f1e; color:#e6f1ff; border-radius:12px;">
         <h2 style="color:#00d4ff; border-bottom:2px solid #f0b429; padding-bottom:10px;">⚡ New Quote Request — Zap Site Studio</h2>
@@ -72,15 +85,14 @@ Deno.serve(async (req) => {
       </div>
     `;
 
-    const emailRes = await fetch("https://connector-gateway.lovable.dev/resend/emails", {
+    const emailRes = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "X-Connection-Api-Key": RESEND_API_KEY,
+        Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Zap Site Studio <onboarding@resend.dev>",
+        from: FROM_EMAIL,
         to: [TO_EMAIL],
         reply_to: data.email,
         subject: "⚡ New Quote Request — Zap Site Studio",
@@ -88,22 +100,23 @@ Deno.serve(async (req) => {
       }),
     });
 
+    const emailBody = await emailRes.text();
     if (!emailRes.ok) {
-      const errText = await emailRes.text();
-      console.error("Resend error:", emailRes.status, errText);
-      return new Response(JSON.stringify({ error: "Failed to send email" }), {
+      console.error("[send-quote-request] Resend error:", emailRes.status, emailBody);
+      return new Response(JSON.stringify({ error: "Failed to send email", status: emailRes.status, details: emailBody }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    console.log("[send-quote-request] Email sent OK:", emailBody);
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    console.error("Unhandled error:", e);
-    return new Response(JSON.stringify({ error: "Internal server error" }), {
+    console.error("[send-quote-request] Unhandled error:", e);
+    return new Response(JSON.stringify({ error: "Internal server error", details: String(e) }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
