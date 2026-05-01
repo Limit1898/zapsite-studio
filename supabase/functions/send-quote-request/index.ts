@@ -11,7 +11,11 @@ const BodySchema = z.object({
   project_description: z.string().trim().min(10).max(2000),
 });
 
-const TO_EMAIL = "zap.site.studio@gmail.com";
+// NOTE: Until a domain is verified at resend.com/domains, Resend only allows
+// sending to the account owner's email (tahajuju7@gmail.com). Once a domain
+// is verified, change TO_EMAIL back to "zap.site.studio@gmail.com" and update
+// FROM_EMAIL to use that verified domain.
+const TO_EMAIL = "tahajuju7@gmail.com";
 const FROM_EMAIL = "Zap Site Studio <onboarding@resend.dev>";
 
 Deno.serve(async (req) => {
