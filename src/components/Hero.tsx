@@ -6,7 +6,8 @@ import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 
 export const Hero = () => {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const isArabic = lang === "ar";
 
   const scrollTo = (id: string) =>
     document.querySelector(id)?.scrollIntoView({ behavior: "smooth" });
