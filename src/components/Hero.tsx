@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { ArrowDown, ArrowRight, Sparkles } from "lucide-react";
 import { ZapBackground } from "./ZapBackground";
 import { useI18n } from "@/lib/i18n";
+
 import { Button } from "@/components/ui/button";
 
 export const Hero = () => {
