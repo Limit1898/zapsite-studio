@@ -5,7 +5,7 @@ export const translations = {
     nav: { work: "Çalışmalarım", pricing: "Fiyatlar", process: "Süreç", contact: "İletişim", quote: "Teklif Al" },
     hero: {
       tagline: "Türkiye • Web Geliştirme",
-      title: "Sizin İçin Çalışan Web Siteleri Yapıyorum",
+      title: "Sizin İçin Çalışan Web Siteleri Yapıyoruz",
       subtitle: "Her ölçekteki işletme için uygun fiyatlı, hızlı ve profesyonel web siteleri.",
       cta1: "Çalışmalarımı Gör",
       cta2: "Ücretsiz Teklif Al",
