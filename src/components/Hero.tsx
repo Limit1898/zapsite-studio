@@ -32,7 +32,7 @@ export const Hero = () => {
             <Sparkles className="h-3.5 w-3.5" /> {t.hero.tagline}
           </div>
 
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-[1.05] mb-6">
+          <h1 className={`text-5xl sm:text-6xl md:text-7xl lg:text-8xl mb-6 ${isArabic ? "leading-[1.4] pb-2" : "leading-[1.05]"}`}>
             {t.hero.title.split(" ").map((w, i) => (
               <motion.span
                 key={i}
@@ -41,7 +41,7 @@ export const Hero = () => {
                 transition={{ delay: 0.1 + i * 0.05, duration: 0.6 }}
                 className="inline-block me-3"
               >
-                {i === 2 || i === 3 ? <span className="text-gradient italic">{w}</span> : w}
+                {i === 2 || i === 3 ? <span className={`text-gradient ${isArabic ? "" : "italic"}`}>{w}</span> : w}
               </motion.span>
             ))}
           </h1>
