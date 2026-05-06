@@ -2,10 +2,12 @@ import { motion } from "framer-motion";
 import { ArrowDown, ArrowRight, Sparkles } from "lucide-react";
 import { ZapBackground } from "./ZapBackground";
 import { useI18n } from "@/lib/i18n";
+
 import { Button } from "@/components/ui/button";
 
 export const Hero = () => {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const isArabic = lang === "ar";
 
   const scrollTo = (id: string) =>
     document.querySelector(id)?.scrollIntoView({ behavior: "smooth" });
@@ -30,7 +32,7 @@ export const Hero = () => {
             <Sparkles className="h-3.5 w-3.5" /> {t.hero.tagline}
           </div>
 
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-[1.05] mb-6">
+          <h1 className={`text-5xl sm:text-6xl md:text-7xl lg:text-8xl mb-6 ${isArabic ? "leading-[1.4] pb-2" : "leading-[1.05]"}`}>
             {t.hero.title.split(" ").map((w, i) => (
               <motion.span
                 key={i}
@@ -39,7 +41,7 @@ export const Hero = () => {
                 transition={{ delay: 0.1 + i * 0.05, duration: 0.6 }}
                 className="inline-block me-3"
               >
-                {i === 2 || i === 3 ? <span className="text-gradient italic">{w}</span> : w}
+                {i === 2 || i === 3 ? <span className={`text-gradient ${isArabic ? "" : "italic"}`}>{w}</span> : w}
               </motion.span>
             ))}
           </h1>
