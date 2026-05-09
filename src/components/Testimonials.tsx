@@ -5,21 +5,21 @@ import { useI18n } from "@/lib/i18n";
 
 const COPY: Record<string, { title: string; subtitle: string; cta: string }> = {
   tr: {
-    title: "⭐ İlk Müşterimiz Siz Olun",
+    title: "⚡ Sınırlı Süre Teklifi",
     subtitle:
-      "Yeni başlayan bir freelancer olarak ilk müşterilerime özel indirimli fiyatlar sunuyorum. Siz de bu fırsattan yararlanın!",
+      "Her ölçekteki işletme için hızlı, uygun fiyatlı ve profesyonel web siteleri üretiyoruz. Sınırlı kontenjan — hemen yerinizi ayırtın!",
     cta: "Teklif Al",
   },
   en: {
-    title: "⭐ Be Our First Client",
+    title: "⚡ Limited Time Offer",
     subtitle:
-      "As a new freelancer I am offering special discounted prices for my first clients. Take advantage of this opportunity!",
+      "We build fast, affordable and professional websites for businesses of all sizes. Get your website today at an unbeatable price — limited spots available!",
     cta: "Get a Quote",
   },
   ar: {
-    title: "⭐ كن عميلنا الأول",
+    title: "⚡ عرض لفترة محدودة",
     subtitle:
-      "بصفتي مستقلًا في بداية مشواري، أقدّم أسعارًا خاصة ومخفّضة لأوائل عملائي. اغتنم هذه الفرصة!",
+      "نبني مواقع إلكترونية سريعة واحترافية وبأسعار مناسبة لجميع الأعمال. أماكن محدودة — احجز موقعك الآن!",
     cta: "اطلب عرض السعر",
   },
 };
