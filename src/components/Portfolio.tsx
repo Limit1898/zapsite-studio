@@ -4,15 +4,15 @@ import { useI18n } from "@/lib/i18n";
 
 const COPY: Record<string, { title: string; subtitle: string }> = {
   tr: {
-    title: "🚀 Projelerimiz Yakında / Our Work Coming Soon",
+    title: "🚀 Projelerimiz Yakında",
     subtitle: "Yakında burada en yeni çalışmalarımızı paylaşacağız.",
   },
   en: {
-    title: "🚀 Projelerimiz Yakında / Our Work Coming Soon",
+    title: "🚀 Our Work Coming Soon",
     subtitle: "We'll be sharing our latest work here very soon.",
   },
   ar: {
-    title: "🚀 أعمالنا قريبًا / Our Work Coming Soon",
+    title: "🚀 أعمالنا قريبًا",
     subtitle: "سنشارك أحدث مشاريعنا هنا قريبًا.",
   },
 };
