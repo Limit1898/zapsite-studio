@@ -11,8 +11,6 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 const EMAIL = "zap.site.studio@gmail.com";
-const SUCCESS_MSG = "✅ Teşekkürler! Mesajınız alındı, 24 saat içinde dönüş yapacağım. / Thank you! I will get back to you within 24 hours.";
-const ERROR_MSG = "❌ Bir hata oluştu. Lütfen tekrar deneyin. / Something went wrong. Please try again.";
 
 export const Contact = () => {
   const { t } = useI18n();
@@ -43,7 +41,7 @@ export const Contact = () => {
       const errs: Record<string, boolean> = {};
       r.error.issues.forEach((i) => (errs[i.path[0] as string] = true));
       setErrors(errs);
-      toast.error(ERROR_MSG);
+      toast.error(t.contact.error);
       return;
     }
     setSending(true);
@@ -59,11 +57,11 @@ export const Contact = () => {
         },
       });
       if (error || (data as any)?.error) throw error || new Error((data as any).error);
-      toast.success(SUCCESS_MSG, { duration: 6000 });
+      toast.success(t.contact.success, { duration: 6000 });
       setForm({ name: "", email: "", phone: "", type: "", budget: "", desc: "" });
     } catch (err) {
       console.error("Quote submission failed:", err);
-      toast.error(ERROR_MSG, { duration: 6000 });
+      toast.error(t.contact.error, { duration: 6000 });
     } finally {
       setSending(false);
     }

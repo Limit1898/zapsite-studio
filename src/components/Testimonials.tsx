@@ -5,22 +5,22 @@ import { useI18n } from "@/lib/i18n";
 
 const COPY: Record<string, { title: string; subtitle: string; cta: string }> = {
   tr: {
-    title: "⭐ İlk Müşterimiz Siz Olun / Be Our First Client",
+    title: "⭐ İlk Müşterimiz Siz Olun",
     subtitle:
-      "Yeni başlayan bir freelancer olarak ilk müşterilerime özel indirimli fiyatlar sunuyorum. Siz de bu fırsattan yararlanın! / As a new freelancer I am offering special discounted prices for my first clients. Take advantage of this opportunity!",
-    cta: "Teklif Al / Get a Quote",
+      "Yeni başlayan bir freelancer olarak ilk müşterilerime özel indirimli fiyatlar sunuyorum. Siz de bu fırsattan yararlanın!",
+    cta: "Teklif Al",
   },
   en: {
-    title: "⭐ İlk Müşterimiz Siz Olun / Be Our First Client",
+    title: "⭐ Be Our First Client",
     subtitle:
-      "Yeni başlayan bir freelancer olarak ilk müşterilerime özel indirimli fiyatlar sunuyorum. Siz de bu fırsattan yararlanın! / As a new freelancer I am offering special discounted prices for my first clients. Take advantage of this opportunity!",
-    cta: "Teklif Al / Get a Quote",
+      "As a new freelancer I am offering special discounted prices for my first clients. Take advantage of this opportunity!",
+    cta: "Get a Quote",
   },
   ar: {
-    title: "⭐ كن عميلنا الأول / Be Our First Client",
+    title: "⭐ كن عميلنا الأول",
     subtitle:
       "بصفتي مستقلًا في بداية مشواري، أقدّم أسعارًا خاصة ومخفّضة لأوائل عملائي. اغتنم هذه الفرصة!",
-    cta: "اطلب عرض السعر / Get a Quote",
+    cta: "اطلب عرض السعر",
   },
 };
 
