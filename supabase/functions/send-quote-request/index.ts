@@ -63,7 +63,7 @@ Deno.serve(async (req) => {
     const { error: dbError } = await supabase.from("quote_requests").insert(data);
     if (dbError) {
       console.error("[send-quote-request] DB insert error:", dbError);
-      return new Response(JSON.stringify({ error: "Failed to save submission", details: dbError.message }), {
+      return new Response(JSON.stringify({ error: "Failed to save submission" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
