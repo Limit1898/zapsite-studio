@@ -52,7 +52,7 @@ Deno.serve(async (req) => {
     if (!parsed.success) {
       console.error("[send-quote-request] validation failed:", parsed.error.flatten().fieldErrors);
       return new Response(
-        JSON.stringify({ error: "Invalid input", details: parsed.error.flatten().fieldErrors }),
+        JSON.stringify({ error: "Invalid input" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -63,7 +63,7 @@ Deno.serve(async (req) => {
     const { error: dbError } = await supabase.from("quote_requests").insert(data);
     if (dbError) {
       console.error("[send-quote-request] DB insert error:", dbError);
-      return new Response(JSON.stringify({ error: "Failed to save submission", details: dbError.message }), {
+      return new Response(JSON.stringify({ error: "Failed to save submission" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -107,7 +107,7 @@ Deno.serve(async (req) => {
     const emailBody = await emailRes.text();
     if (!emailRes.ok) {
       console.error("[send-quote-request] Resend error:", emailRes.status, emailBody);
-      return new Response(JSON.stringify({ error: "Failed to send email", status: emailRes.status, details: emailBody }), {
+      return new Response(JSON.stringify({ error: "Failed to send email" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -120,7 +120,7 @@ Deno.serve(async (req) => {
     });
   } catch (e) {
     console.error("[send-quote-request] Unhandled error:", e);
-    return new Response(JSON.stringify({ error: "Internal server error", details: String(e) }), {
+    return new Response(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
