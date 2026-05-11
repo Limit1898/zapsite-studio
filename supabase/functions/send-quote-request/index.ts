@@ -52,7 +52,7 @@ Deno.serve(async (req) => {
     if (!parsed.success) {
       console.error("[send-quote-request] validation failed:", parsed.error.flatten().fieldErrors);
       return new Response(
-        JSON.stringify({ error: "Invalid input", details: parsed.error.flatten().fieldErrors }),
+        JSON.stringify({ error: "Invalid input" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
