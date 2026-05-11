@@ -4,10 +4,8 @@
       <stop offset="0%" stop-color="#00d4ff"/>
       <stop offset="100%" stop-color="#f0b429"/>
     </linearGradient>
-    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="0.8"/>
-    </filter>
   </defs>
+  <rect width="24" height="24" rx="4" fill="#0a1633"/>
   <path d="M14.5 2 L4 13.2 h6.2 L9.5 22 L20 10.8 h-6.2 Z"
-        fill="url(#g)" stroke="#7be9ff" stroke-width="0.5" stroke-linejoin="round" filter="url(#glow)"/>
+        fill="url(#g)" stroke="#7be9ff" stroke-width="0.5" stroke-linejoin="round"/>
 </svg>
