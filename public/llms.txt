@@ -1,0 +1,15 @@
+# Zap Site Studio
+
+> Türkiye merkezli web stüdyosu. Hızlı, uygun fiyatlı ve profesyonel web siteleri — açılış sayfaları, kurumsal siteler ve e-ticaret çözümleri.
+
+Zap Site Studio, küçük ve orta ölçekli işletmeler için modern, performanslı ve SEO dostu web siteleri tasarlayıp geliştirir. Üç dilde (Türkçe, İngilizce, Arapça) hizmet verir.
+
+## Pages
+
+- [Home](/): Hizmetler, fiyatlandırma, portföy, süreç, müşteri yorumları ve iletişim formunu içeren tek sayfalık tanıtım sitesi.
+
+## Contact
+
+- Email: zap.site.studio@gmail.com
+- Phone: +90 506 890 16 16
+- Location: Istanbul, Turkey
