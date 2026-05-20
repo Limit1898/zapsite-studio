@@ -9,9 +9,6 @@ export const Hero = () => {
   const { t, lang } = useI18n();
   const isArabic = lang === "ar";
 
-  const scrollTo = (id: string) =>
-    document.querySelector(id)?.scrollIntoView({ behavior: "smooth" });
-
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
       <div className="absolute inset-0">
@@ -62,14 +59,24 @@ export const Hero = () => {
             className="flex flex-wrap gap-4"
           >
             <Button
-              onClick={() => scrollTo("#work")}
+              type="button"
+              onClick={() => {
+                document.getElementById("work")?.scrollIntoView({
+                  behavior: "smooth",
+                });
+              }}
               className="bg-cyan text-background hover:bg-cyan/90 font-semibold rounded-full px-7 h-12 text-base group glow-cyan"
             >
               {t.hero.cta1}
               <ArrowRight className="ms-2 h-4 w-4 group-hover:translate-x-1 transition-transform rtl:rotate-180" />
             </Button>
             <Button
-              onClick={() => scrollTo("#contact")}
+              type="button"
+              onClick={() => {
+                document.getElementById("contact")?.scrollIntoView({
+                  behavior: "smooth",
+                });
+              }}
               variant="outline"
               className="border-white/20 bg-transparent hover:bg-white/5 rounded-full px-7 h-12 text-base"
             >
@@ -79,7 +86,12 @@ export const Hero = () => {
         </motion.div>
 
         <motion.button
-          onClick={() => scrollTo("#types")}
+          type="button"
+          onClick={() => {
+            document.getElementById("types")?.scrollIntoView({
+              behavior: "smooth",
+            });
+          }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5 }}

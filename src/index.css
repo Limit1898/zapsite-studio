@@ -103,6 +103,14 @@
   .container-x { @apply max-w-7xl mx-auto; }
 }
 
+#types,
+#work,
+#pricing,
+#process,
+#contact {
+  scroll-margin-top: 6rem;
+}
+
 @keyframes float {
   0%, 100% { transform: translateY(0) translateX(0); }
   50% { transform: translateY(-30px) translateX(15px); }
