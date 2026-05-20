@@ -25,15 +25,15 @@ export const Navbar = () => {
   }, []);
 
   const links = [
-    { href: "#work", label: t.nav.work },
-    { href: "#pricing", label: t.nav.pricing },
-    { href: "#process", label: t.nav.process },
-    { href: "#contact", label: t.nav.contact },
+    { id: "work", label: t.nav.work },
+    { id: "pricing", label: t.nav.pricing },
+    { id: "process", label: t.nav.process },
+    { id: "contact", label: t.nav.contact },
   ];
 
-  const goTo = (href: string) => {
+  const goTo = (id: string) => {
     setMobile(false);
-    document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -43,15 +43,21 @@ export const Navbar = () => {
       }`}
     >
       <nav className="container-x flex items-center justify-between px-6 md:px-10">
-        <a href="#" className="group" aria-label="Zap home">
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="group"
+          aria-label="Zap home"
+        >
           <Logo size="md" className="transition-transform group-hover:scale-105" />
-        </a>
+        </button>
 
         <div className="hidden md:flex items-center gap-8">
           {links.map((l) => (
             <button
-              key={l.href}
-              onClick={() => goTo(l.href)}
+              key={l.id}
+              type="button"
+              onClick={() => goTo(l.id)}
               className="text-sm text-muted-foreground hover:text-foreground transition-colors relative group"
             >
               {l.label}
@@ -100,7 +106,8 @@ export const Navbar = () => {
           </div>
 
           <Button
-            onClick={() => goTo("#contact")}
+            type="button"
+            onClick={() => goTo("contact")}
             className="hidden md:inline-flex bg-cyan text-background hover:bg-cyan/90 font-semibold rounded-full px-5"
           >
             {t.nav.quote}
@@ -127,15 +134,17 @@ export const Navbar = () => {
             <div className="px-6 py-4 flex flex-col gap-3">
               {links.map((l) => (
                 <button
-                  key={l.href}
-                  onClick={() => goTo(l.href)}
+                  key={l.id}
+                  type="button"
+                  onClick={() => goTo(l.id)}
                   className="text-start text-sm text-foreground py-2 border-b border-white/5"
                 >
                   {l.label}
                 </button>
               ))}
               <Button
-                onClick={() => goTo("#contact")}
+                type="button"
+                onClick={() => goTo("contact")}
                 className="bg-cyan text-background hover:bg-cyan/90 rounded-full mt-2"
               >
                 {t.nav.quote}

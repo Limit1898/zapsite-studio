@@ -5,10 +5,10 @@ import { Logo } from "@/components/Logo";
 export const Footer = () => {
   const { t, lang } = useI18n();
   const links = [
-    { href: "#work", label: t.nav.work },
-    { href: "#pricing", label: t.nav.pricing },
-    { href: "#process", label: t.nav.process },
-    { href: "#contact", label: t.nav.contact },
+    { id: "work", label: t.nav.work },
+    { id: "pricing", label: t.nav.pricing },
+    { id: "process", label: t.nav.process },
+    { id: "contact", label: t.nav.contact },
   ];
 
   const contactTitle =
@@ -31,8 +31,18 @@ export const Footer = () => {
             <h4 className="text-xs uppercase tracking-widest text-muted-foreground mb-4">{t.footer.links}</h4>
             <ul className="space-y-2">
               {links.map((l) => (
-                <li key={l.href}>
-                  <a href={l.href} className="text-sm hover:text-cyan transition-colors">{l.label}</a>
+                <li key={l.id}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      document.getElementById(l.id)?.scrollIntoView({
+                        behavior: "smooth",
+                      });
+                    }}
+                    className="text-sm hover:text-cyan transition-colors"
+                  >
+                    {l.label}
+                  </button>
                 </li>
               ))}
             </ul>
