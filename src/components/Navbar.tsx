@@ -33,7 +33,12 @@ export const Navbar = () => {
 
   const goTo = (href: string) => {
     setMobile(false);
-    document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+    const id = href.startsWith("#") ? href.slice(1) : href;
+    const el = document.getElementById(id);
+    if (!el) return;
+    const headerOffset = 80;
+    const top = el.getBoundingClientRect().top + window.scrollY - headerOffset;
+    window.scrollTo({ top, behavior: "smooth" });
   };
 
   return (
