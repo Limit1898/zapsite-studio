@@ -5,6 +5,7 @@ import { useI18n } from "@/lib/i18n";
 import type { Lang } from "@/lib/translations";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/Logo";
+import { scrollToSection } from "@/lib/scrollToSection";
 
 const langs: { code: Lang; label: string; flag: string }[] = [
   { code: "tr", label: "Türkçe", flag: "🇹🇷" },
@@ -32,8 +33,7 @@ export const Navbar = () => {
   ];
 
   const goTo = (id: string) => {
-    setMobile(false);
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    scrollToSection(id, () => setMobile(false));
   };
 
   return (

@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
+import { scrollToSection } from "@/lib/scrollToSection";
 
 const COPY: Record<string, { title: string; subtitle: string; cta: string }> = {
   tr: {
@@ -28,8 +29,7 @@ export const Testimonials = () => {
   const { lang } = useI18n();
   const c = COPY[lang] ?? COPY.en;
 
-  const scrollContact = () =>
-    document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+  const scrollContact = () => scrollToSection("contact");
 
   return (
     <section className="section-pad relative">

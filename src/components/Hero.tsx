@@ -4,6 +4,7 @@ import { ZapBackground } from "./ZapBackground";
 import { useI18n } from "@/lib/i18n";
 
 import { Button } from "@/components/ui/button";
+import { scrollToSection } from "@/lib/scrollToSection";
 
 export const Hero = () => {
   const { t, lang } = useI18n();
@@ -60,11 +61,7 @@ export const Hero = () => {
           >
             <Button
               type="button"
-              onClick={() => {
-                document.getElementById("work")?.scrollIntoView({
-                  behavior: "smooth",
-                });
-              }}
+              onClick={() => scrollToSection("work")}
               className="bg-cyan text-background hover:bg-cyan/90 font-semibold rounded-full px-7 h-12 text-base group glow-cyan"
             >
               {t.hero.cta1}
@@ -72,11 +69,7 @@ export const Hero = () => {
             </Button>
             <Button
               type="button"
-              onClick={() => {
-                document.getElementById("contact")?.scrollIntoView({
-                  behavior: "smooth",
-                });
-              }}
+              onClick={() => scrollToSection("contact")}
               variant="outline"
               className="border-white/20 bg-transparent hover:bg-white/5 rounded-full px-7 h-12 text-base"
             >
@@ -87,11 +80,7 @@ export const Hero = () => {
 
         <motion.button
           type="button"
-          onClick={() => {
-            document.getElementById("types")?.scrollIntoView({
-              behavior: "smooth",
-            });
-          }}
+          onClick={() => scrollToSection("types")}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5 }}
