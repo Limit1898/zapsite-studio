@@ -1,6 +1,7 @@
 import { Mail, Phone, MapPin } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { Logo } from "@/components/Logo";
+import { scrollToSection } from "@/lib/scrollToSection";
 
 export const Footer = () => {
   const { t, lang } = useI18n();
@@ -34,11 +35,7 @@ export const Footer = () => {
                 <li key={l.id}>
                   <button
                     type="button"
-                    onClick={() => {
-                      document.getElementById(l.id)?.scrollIntoView({
-                        behavior: "smooth",
-                      });
-                    }}
+                    onClick={() => scrollToSection(l.id)}
                     className="text-sm hover:text-cyan transition-colors"
                   >
                     {l.label}

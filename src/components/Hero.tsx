@@ -80,11 +80,7 @@ export const Hero = () => {
 
         <motion.button
           type="button"
-          onClick={() => {
-            document.getElementById("types")?.scrollIntoView({
-              behavior: "smooth",
-            });
-          }}
+          onClick={() => scrollToSection("types")}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5 }}

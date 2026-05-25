@@ -9,6 +9,7 @@ import { Testimonials } from "@/components/Testimonials";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 import { I18nProvider, useI18n } from "@/lib/i18n";
+import { scrollToSection } from "@/lib/scrollToSection";
 
 const Page = () => {
   const { dir } = useI18n();
@@ -23,8 +24,7 @@ const Page = () => {
     window.setTimeout(() => setHighlight(null), 2500);
   };
 
-  const scrollContact = () =>
-    document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+  const scrollContact = () => scrollToSection("contact");
 
   return (
     <div dir={dir} className="min-h-screen bg-background text-foreground overflow-x-hidden">
