@@ -5,7 +5,7 @@ const API = "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/cu
 
 export const USD_PRICES = {
   // services
-  landing: 25,
+  landing: 50,
   blog: 37.5,
   portfolio: 32.5,
   business: 55,
