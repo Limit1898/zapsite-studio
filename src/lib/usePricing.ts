@@ -13,7 +13,7 @@ export const USD_PRICES = {
   // plans
   starter: 50,
   pro: 100,
-  premium: 225,
+  premium: 300,
 };
 
 export type PriceKey = keyof typeof USD_PRICES;
