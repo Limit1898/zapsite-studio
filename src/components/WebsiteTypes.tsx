@@ -6,6 +6,8 @@ import { usePricing, PriceKey } from "@/lib/usePricing";
 const icons = [Monitor, Building2, ShoppingBag, Newspaper, Palette];
 const priceKeys: PriceKey[] = ["landing", "business", "ecom", "blog", "portfolio"];
 const planTargets = ["starter", "pro", "premium", "pro", "pro"]; // which pricing plan to scroll to
+// display order (cheapest → most expensive): landing, blog, portfolio, business, ecom
+const order = [0, 3, 4, 1, 2];
 
 export const WebsiteTypes = ({ onSelect }: { onSelect: (plan: string) => void }) => {
   const { t } = useI18n();
@@ -26,17 +28,18 @@ export const WebsiteTypes = ({ onSelect }: { onSelect: (plan: string) => void })
         </motion.div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
-          {t.types.items.map((item, i) => {
-            const Icon = icons[i];
+          {order.map((idx, pos) => {
+            const item = t.types.items[idx];
+            const Icon = icons[idx];
             return (
               <motion.button
-                key={i}
+                key={idx}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.08 }}
+                transition={{ delay: pos * 0.08 }}
                 whileHover={{ y: -6 }}
-                onClick={() => onSelect(planTargets[i])}
+                onClick={() => onSelect(planTargets[idx])}
                 className="text-start glass rounded-2xl p-6 hover:border-cyan/40 transition-all group relative overflow-hidden"
               >
                 <div className="absolute -top-12 -end-12 h-32 w-32 rounded-full bg-cyan/0 group-hover:bg-cyan/10 blur-2xl transition-all" />
@@ -47,7 +50,7 @@ export const WebsiteTypes = ({ onSelect }: { onSelect: (plan: string) => void })
                   <h3 className="font-display text-xl mb-2">{item.title}</h3>
                   <p className="text-sm text-muted-foreground mb-5 leading-relaxed">{item.desc}</p>
                   <div className="flex items-baseline gap-1.5 pt-4 border-t border-white/10">
-                    <span className="text-2xl font-display font-bold text-gradient">{priceFmt(priceKeys[i])}</span>
+                    <span className="text-2xl font-display font-bold text-gradient">{priceFmt(priceKeys[idx])}</span>
                     <span className="text-xs text-muted-foreground">+</span>
                   </div>
                 </div>
