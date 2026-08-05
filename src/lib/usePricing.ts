@@ -6,10 +6,10 @@ const API = "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/cu
 export const USD_PRICES = {
   // services
   landing: 50,
-  blog: 37.5,
-  portfolio: 32.5,
+  blog: 60,
+  portfolio: 75,
   business: 100,
-  ecom: 150,
+  ecom: 300,
   // plans
   starter: 50,
   pro: 100,
