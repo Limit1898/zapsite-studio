@@ -12,7 +12,7 @@ export const USD_PRICES = {
   ecom: 150,
   // plans
   starter: 50,
-  pro: 67.5,
+  pro: 100,
   premium: 225,
 };
 
