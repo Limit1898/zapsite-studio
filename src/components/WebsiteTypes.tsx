@@ -50,7 +50,7 @@ export const WebsiteTypes = ({ onSelect }: { onSelect: (plan: string) => void })
                   <h3 className="font-display text-xl mb-2">{item.title}</h3>
                   <p className="text-sm text-muted-foreground mb-5 leading-relaxed">{item.desc}</p>
                   <div className="flex items-baseline gap-1.5 pt-4 border-t border-white/10">
-                    <span className="text-2xl font-display font-bold text-gradient">{priceFmt(priceKeys[i])}</span>
+                    <span className="text-2xl font-display font-bold text-gradient">{priceFmt(priceKeys[idx])}</span>
                     <span className="text-xs text-muted-foreground">+</span>
                   </div>
                 </div>
