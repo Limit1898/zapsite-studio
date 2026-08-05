@@ -6,6 +6,8 @@ import { usePricing, PriceKey } from "@/lib/usePricing";
 const icons = [Monitor, Building2, ShoppingBag, Newspaper, Palette];
 const priceKeys: PriceKey[] = ["landing", "business", "ecom", "blog", "portfolio"];
 const planTargets = ["starter", "pro", "premium", "pro", "pro"]; // which pricing plan to scroll to
+// display order (cheapest → most expensive): landing, blog, portfolio, business, ecom
+const order = [0, 3, 4, 1, 2];
 
 export const WebsiteTypes = ({ onSelect }: { onSelect: (plan: string) => void }) => {
   const { t } = useI18n();
