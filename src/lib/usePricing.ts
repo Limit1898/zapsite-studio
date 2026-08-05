@@ -8,7 +8,7 @@ export const USD_PRICES = {
   landing: 50,
   blog: 37.5,
   portfolio: 32.5,
-  business: 55,
+  business: 100,
   ecom: 150,
   // plans
   starter: 25,
