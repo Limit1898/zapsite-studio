@@ -179,14 +179,36 @@ export const translations = {
     contact: {
       title: "Let's Build Something Great",
       subtitle: "Tell me about your project and I'll get back to you within 24 hours.",
-      name: "Full Name",
-      email: "Email",
-      phone: "Phone",
-      type: "Website Type",
+      name: "What is your full name?",
+      namePlaceholder: "e.g. Ahmed Mohamed",
+      email: "What is your email address?",
+      emailPlaceholder: "e.g. ahmed@gmail.com",
+      phone: "What is your phone number?",
+      phonePlaceholder: "e.g. +90 555 123 4567",
+      type: "What type of website do you need?",
       typePlaceholder: "Select a type",
-      budget: "Budget Range",
+      domain: "Would you like us to help you get a domain?",
+      domainYes: "✅ Yes, I need a domain",
+      domainNo: "❌ No thanks",
+      domainLabel: "What domain name would you like?",
+      domainPlaceholder: "e.g. mybusiness.com",
+      budget: "What is your budget range?",
       budgetPlaceholder: "Select a range",
-      desc: "Project Description",
+      desc: "Tell us about your project by answering these questions:",
+      descTemplate: `1. What does your business do?
+Answer: 
+
+2. Who are your target customers?
+Answer: 
+
+3. What pages do you need on your website?
+Answer: 
+
+4. Do you have a logo or brand colors?
+Answer: 
+
+5. Any websites you like as a reference?
+Answer: `,
       submit: "Get a Quote",
       sending: "Sending...",
       success: "✅ Thank you! I will get back to you within 24 hours.",
