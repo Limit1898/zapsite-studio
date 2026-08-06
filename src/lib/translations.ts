@@ -77,14 +77,36 @@ export const translations = {
     contact: {
       title: "Birlikte Harika Bir Şey Yapalım",
       subtitle: "Projenizi anlatın, 24 saat içinde dönüş yapayım.",
-      name: "Ad Soyad",
-      email: "E-posta",
-      phone: "Telefon",
-      type: "Web Sitesi Türü",
+      name: "Adınız ve soyadınız nedir?",
+      namePlaceholder: "örn. Ahmet Mehmet",
+      email: "E-posta adresiniz nedir?",
+      emailPlaceholder: "örn. ahmet@gmail.com",
+      phone: "Telefon numaranız nedir?",
+      phonePlaceholder: "örn. +90 555 123 4567",
+      type: "Ne tür bir web sitesine ihtiyacınız var?",
       typePlaceholder: "Bir tür seçin",
-      budget: "Bütçe Aralığı",
+      domain: "Alan adı (domain) almanıza yardımcı olalım mı?",
+      domainYes: "✅ Evet, alan adı istiyorum",
+      domainNo: "❌ Hayır, teşekkürler",
+      domainLabel: "Hangi alan adını istiyorsunuz?",
+      domainPlaceholder: "örn. mybusiness.com",
+      budget: "Bütçe aralığınız nedir?",
       budgetPlaceholder: "Bir aralık seçin",
-      desc: "Proje Açıklaması",
+      desc: "Bu soruları yanıtlayarak projenizi anlatın:",
+      descTemplate: `1. İşletmeniz ne yapıyor?
+Cevap: 
+
+2. Hedef müşterileriniz kimler?
+Cevap: 
+
+3. Sitenizde hangi sayfalar olsun istiyorsunuz?
+Cevap: 
+
+4. Logonuz veya marka renkleriniz var mı?
+Cevap: 
+
+5. Beğendiğiniz örnek web siteleri var mı?
+Cevap: `,
       submit: "Teklif Al",
       sending: "Gönderiliyor...",
       success: "✅ Teşekkürler! Mesajınız alındı, 24 saat içinde dönüş yapacağım.",
