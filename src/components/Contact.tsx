@@ -176,18 +176,18 @@ export const Contact = () => {
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-xs text-muted-foreground mb-1.5 block">{t.contact.name} *</label>
-                <Input value={form.name} onChange={(e) => onChange("name", e.target.value)} className={fieldClass("name")} maxLength={100} />
+                <Input value={form.name} onChange={(e) => onChange("name", e.target.value)} placeholder={t.contact.namePlaceholder} className={fieldClass("name")} maxLength={100} />
               </div>
               <div>
                 <label className="text-xs text-muted-foreground mb-1.5 block">{t.contact.email} *</label>
-                <Input type="email" value={form.email} onChange={(e) => onChange("email", e.target.value)} className={fieldClass("email")} maxLength={255} />
+                <Input type="email" value={form.email} onChange={(e) => onChange("email", e.target.value)} placeholder={t.contact.emailPlaceholder} className={fieldClass("email")} maxLength={255} />
               </div>
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-xs text-muted-foreground mb-1.5 block">{t.contact.phone} *</label>
-                <Input value={form.phone} onChange={(e) => onChange("phone", e.target.value)} className={fieldClass("phone")} maxLength={40} />
+                <Input value={form.phone} onChange={(e) => onChange("phone", e.target.value)} placeholder={t.contact.phonePlaceholder} className={fieldClass("phone")} maxLength={40} />
               </div>
               <div>
                 <label className="text-xs text-muted-foreground mb-1.5 block">{t.contact.type} *</label>
@@ -202,6 +202,40 @@ export const Contact = () => {
                   ))}
                 </select>
               </div>
+            </div>
+
+            <div>
+              <label className="text-xs text-muted-foreground mb-1.5 block">{t.contact.domain} *</label>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {(["yes", "no"] as const).map((v) => (
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={() => onChange("domainChoice", v)}
+                    className={`h-12 rounded-xl border px-4 text-sm transition-colors ${
+                      form.domainChoice === v
+                        ? "border-cyan bg-cyan/10 text-cyan"
+                        : errors.domainChoice
+                        ? "border-destructive bg-white/5"
+                        : "border-white/10 bg-white/5 hover:border-cyan/40"
+                    }`}
+                  >
+                    {v === "yes" ? t.contact.domainYes : t.contact.domainNo}
+                  </button>
+                ))}
+              </div>
+              {form.domainChoice === "yes" && (
+                <div className="mt-3">
+                  <label className="text-xs text-muted-foreground mb-1.5 block">{t.contact.domainLabel}</label>
+                  <Input
+                    value={form.domain}
+                    onChange={(e) => onChange("domain", e.target.value)}
+                    placeholder={t.contact.domainPlaceholder}
+                    className={fieldClass("domain")}
+                    maxLength={120}
+                  />
+                </div>
+              )}
             </div>
 
             <div>
@@ -221,10 +255,10 @@ export const Contact = () => {
             <div>
               <label className="text-xs text-muted-foreground mb-1.5 block">{t.contact.desc} *</label>
               <Textarea
-                rows={5}
+                rows={16}
                 value={form.desc}
                 onChange={(e) => onChange("desc", e.target.value)}
-                className={`bg-white/5 border-white/10 rounded-xl resize-none ${errors.desc ? "border-destructive ring-1 ring-destructive" : ""}`}
+                className={`bg-white/5 border-white/10 rounded-xl resize-y min-h-[420px] leading-relaxed ${errors.desc ? "border-destructive ring-1 ring-destructive" : ""}`}
                 maxLength={2000}
               />
             </div>
