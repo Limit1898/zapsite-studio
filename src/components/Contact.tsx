@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, Phone, Clock, Globe2, Send } from "lucide-react";
 import { z } from "zod";
 import { useI18n } from "@/lib/i18n";
+import { translations } from "@/lib/translations";
 import { usePricing } from "@/lib/usePricing";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,8 +13,10 @@ import { supabase } from "@/integrations/supabase/client";
 
 const EMAIL = "zap.site.studio@gmail.com";
 
+const allTemplates = Object.values(translations).map((v: any) => v.contact.descTemplate as string);
+
 export const Contact = () => {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { priceFmt } = usePricing();
 
   const schema = z.object({
@@ -21,13 +24,34 @@ export const Contact = () => {
     email: z.string().trim().email().max(255),
     phone: z.string().trim().min(5).max(40),
     type: z.string().min(1),
+    domainChoice: z.enum(["yes", "no"]),
+    domain: z.string().trim().max(120),
     budget: z.string().min(1),
     desc: z.string().trim().min(10).max(2000),
   });
 
-  const [form, setForm] = useState({ name: "", email: "", phone: "", type: "", budget: "", desc: "" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    type: "",
+    domainChoice: "",
+    domain: "",
+    budget: "",
+    desc: t.contact.descTemplate,
+  });
   const [errors, setErrors] = useState<Record<string, boolean>>({});
   const [sending, setSending] = useState(false);
+  const descRef = useRef(form.desc);
+  descRef.current = form.desc;
+
+  // Swap the description template when the language changes (if untouched)
+  useEffect(() => {
+    if (allTemplates.includes(descRef.current.trim()) || descRef.current.trim() === "") {
+      setForm((f) => ({ ...f, desc: t.contact.descTemplate }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
 
   const onChange = (k: string, v: string) => {
     setForm((f) => ({ ...f, [k]: v }));
@@ -46,6 +70,10 @@ export const Contact = () => {
     }
     setSending(true);
     try {
+      const domainLine =
+        form.domainChoice === "yes"
+          ? `Domain needed: YES${form.domain ? ` (${form.domain})` : ""}`
+          : "Domain needed: NO";
       const { data, error } = await supabase.functions.invoke("send-quote-request", {
         body: {
           full_name: form.name,
@@ -53,12 +81,12 @@ export const Contact = () => {
           phone: form.phone,
           website_type: form.type,
           budget_range: form.budget,
-          project_description: form.desc,
+          project_description: `${domainLine}\n\n${form.desc}`,
         },
       });
       if (error || (data as any)?.error) throw error || new Error((data as any).error);
       toast.success(t.contact.success, { duration: 6000 });
-      setForm({ name: "", email: "", phone: "", type: "", budget: "", desc: "" });
+      setForm({ name: "", email: "", phone: "", type: "", domainChoice: "", domain: "", budget: "", desc: t.contact.descTemplate });
     } catch (err) {
       console.error("Quote submission failed:", err);
       toast.error(t.contact.error, { duration: 6000 });
@@ -69,10 +97,10 @@ export const Contact = () => {
 
   const types = [
     t.portfolio.filters.landing,
-    t.portfolio.filters.business,
-    t.portfolio.filters.ecom,
     t.portfolio.filters.blog,
     t.portfolio.filters.portfolio,
+    t.portfolio.filters.business,
+    t.portfolio.filters.ecom,
   ];
 
   const budgets = [
@@ -84,6 +112,7 @@ export const Contact = () => {
 
   const fieldClass = (k: string) =>
     `bg-white/5 border-white/10 h-12 rounded-xl ${errors[k] ? "border-destructive ring-1 ring-destructive" : ""}`;
+
 
   return (
     <section id="contact" className="section-pad relative">
