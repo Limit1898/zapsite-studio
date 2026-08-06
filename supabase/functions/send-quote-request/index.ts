@@ -8,7 +8,11 @@ const BodySchema = z.object({
   phone: z.string().trim().min(5).max(40),
   website_type: z.string().trim().min(1).max(100),
   budget_range: z.string().trim().min(1).max(100),
-  project_description: z.string().trim().min(10).max(2000),
+  project_description: z.string().trim().min(10).max(6000),
+  image_paths: z
+    .array(z.object({ label: z.string().max(200), path: z.string().max(300) }))
+    .max(20)
+    .optional(),
 });
 
 // NOTE: Until a domain is verified at resend.com/domains, Resend only allows
