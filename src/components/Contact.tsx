@@ -1,22 +1,19 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, Phone, Clock, Globe2, Send } from "lucide-react";
 import { z } from "zod";
 import { useI18n } from "@/lib/i18n";
-import { translations } from "@/lib/translations";
 import { usePricing } from "@/lib/usePricing";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { ProjectQuestionnaire, emptyQuestionnaire, QuestionnaireState } from "@/components/ProjectQuestionnaire";
 
 const EMAIL = "zap.site.studio@gmail.com";
 
-const allTemplates = Object.values(translations).map((v: any) => v.contact.descTemplate as string);
-
 export const Contact = () => {
-  const { t, lang } = useI18n();
+  const { t } = useI18n();
   const { priceFmt } = usePricing();
 
   const schema = z.object({
@@ -27,7 +24,6 @@ export const Contact = () => {
     domainChoice: z.enum(["yes", "no"]),
     domain: z.string().trim().max(120),
     budget: z.string().min(1),
-    desc: z.string().trim().min(10).max(2000),
   });
 
   const [form, setForm] = useState({
@@ -38,42 +34,81 @@ export const Contact = () => {
     domainChoice: "",
     domain: "",
     budget: "",
-    desc: t.contact.descTemplate,
   });
+  const [q, setQ] = useState<QuestionnaireState>(emptyQuestionnaire());
   const [errors, setErrors] = useState<Record<string, boolean>>({});
   const [sending, setSending] = useState(false);
-  const descRef = useRef(form.desc);
-  descRef.current = form.desc;
-
-  // Swap the description template when the language changes (if untouched)
-  useEffect(() => {
-    if (allTemplates.includes(descRef.current.trim()) || descRef.current.trim() === "") {
-      setForm((f) => ({ ...f, desc: t.contact.descTemplate }));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lang]);
 
   const onChange = (k: string, v: string) => {
     setForm((f) => ({ ...f, [k]: v }));
     if (errors[k]) setErrors((e) => ({ ...e, [k]: false }));
   };
 
+  const buildDescription = () => {
+    const q2 = [...q.q2.filter((o) => o !== (t.contact as any).q.q2opts[6]), q.q2other && `Other: ${q.q2other}`].filter(Boolean).join(", ");
+    const q3 = [...q.q3.filter((o) => o !== (t.contact as any).q.q3opts[8]), q.q3other && `Other: ${q.q3other}`].filter(Boolean).join(", ");
+    const lines = [
+      `Domain needed: ${form.domainChoice === "yes" ? `YES${form.domain ? ` (${form.domain})` : ""}` : "NO"}`,
+      "",
+      `1. Business does: ${q.q1}`,
+      `2. Target customers: ${q2}`,
+      `3. Pages needed: ${q3}`,
+      `4. Logo / brand colors: ${q.q4}${q.q4colors ? ` — ${q.q4colors}` : ""}`,
+      `5. Offering: ${q.q5 === "product" ? "Product" : "Service"}`,
+    ];
+    if (q.q5 === "product") {
+      if (q.productCount === "10+") {
+        lines.push(`   Products: 10+ (approx: ${q.productCountApprox || "n/a"}) — full list to be collected`);
+      } else {
+        lines.push(`   Number of products: ${q.productCount}`);
+        q.products.forEach((p, i) => lines.push(`   Product ${i + 1}: ${p.name || "-"} | ${p.price || "-"}${p.file ? ` | image: ${p.file.name}` : ""}`));
+      }
+    } else if (q.q5 === "service") {
+      q.services.forEach((s, i) => lines.push(`   Service ${i + 1}: ${s.name || "-"} | ${s.price || "-"}`));
+    }
+    lines.push(`6. Reference websites: ${q.q6 || "-"}`);
+    return lines.join("\n");
+  };
+
+  const validate = () => {
+    const errs: Record<string, boolean> = {};
+    const r = schema.safeParse(form);
+    if (!r.success) r.error.issues.forEach((i) => (errs[i.path[0] as string] = true));
+    if (!q.q1.trim()) errs.q1 = true;
+    if (q.q2.length === 0) errs.q2 = true;
+    if (q.q3.length === 0) errs.q3 = true;
+    if (!q.q4) errs.q4 = true;
+    if (!q.q5) errs.q5 = true;
+    if (q.q5 === "product" && !q.productCount) errs.q5 = true;
+    if (q.q5 === "service" && !q.services.some((s) => s.name.trim())) errs.q5 = true;
+    return errs;
+  };
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const r = schema.safeParse(form);
-    if (!r.success) {
-      const errs: Record<string, boolean> = {};
-      r.error.issues.forEach((i) => (errs[i.path[0] as string] = true));
+    const errs = validate();
+    if (Object.keys(errs).length) {
       setErrors(errs);
       toast.error(t.contact.error);
       return;
     }
     setSending(true);
     try {
-      const domainLine =
-        form.domainChoice === "yes"
-          ? `Domain needed: YES${form.domain ? ` (${form.domain})` : ""}`
-          : "Domain needed: NO";
+      const image_paths: { label: string; path: string }[] = [];
+      const files = q.products.map((p, i) => ({ file: p.file, label: `${p.name || `Product ${i + 1}`}` })).filter((f) => f.file);
+      if (files.length) {
+        toast.info((t.contact as any).q.uploading);
+        for (const f of files) {
+          const ext = f.file!.name.split(".").pop();
+          const path = `${crypto.randomUUID()}.${ext}`;
+          const { error: upErr } = await supabase.storage.from("quote-uploads").upload(path, f.file!, {
+            contentType: f.file!.type,
+          });
+          if (upErr) throw upErr;
+          image_paths.push({ label: f.label, path });
+        }
+      }
+
       const { data, error } = await supabase.functions.invoke("send-quote-request", {
         body: {
           full_name: form.name,
@@ -81,12 +116,15 @@ export const Contact = () => {
           phone: form.phone,
           website_type: form.type,
           budget_range: form.budget,
-          project_description: `${domainLine}\n\n${form.desc}`,
+          project_description: buildDescription(),
+          image_paths,
         },
       });
       if (error || (data as any)?.error) throw error || new Error((data as any).error);
       toast.success(t.contact.success, { duration: 6000 });
-      setForm({ name: "", email: "", phone: "", type: "", domainChoice: "", domain: "", budget: "", desc: t.contact.descTemplate });
+      setForm({ name: "", email: "", phone: "", type: "", domainChoice: "", domain: "", budget: "" });
+      setQ(emptyQuestionnaire());
+      setErrors({});
     } catch (err) {
       console.error("Quote submission failed:", err);
       toast.error(t.contact.error, { duration: 6000 });
@@ -112,7 +150,6 @@ export const Contact = () => {
 
   const fieldClass = (k: string) =>
     `bg-white/5 border-white/10 h-12 rounded-xl ${errors[k] ? "border-destructive ring-1 ring-destructive" : ""}`;
-
 
   return (
     <section id="contact" className="section-pad relative">
@@ -252,16 +289,15 @@ export const Contact = () => {
               </select>
             </div>
 
-            <div>
-              <label className="text-xs text-muted-foreground mb-1.5 block">{t.contact.desc} *</label>
-              <Textarea
-                rows={16}
-                value={form.desc}
-                onChange={(e) => onChange("desc", e.target.value)}
-                className={`bg-white/5 border-white/10 rounded-xl resize-y min-h-[420px] leading-relaxed ${errors.desc ? "border-destructive ring-1 ring-destructive" : ""}`}
-                maxLength={2000}
-              />
-            </div>
+            <ProjectQuestionnaire
+              value={q}
+              onChange={(v) => {
+                setQ(v);
+                setErrors({});
+              }}
+              errors={errors}
+              onFileError={(m) => toast.error(m)}
+            />
 
             <Button
               type="submit"
