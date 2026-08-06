@@ -60,7 +60,7 @@ Deno.serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    const data = parsed.data;
+    const { image_paths, ...data } = parsed.data;
 
     // Save to DB
     const supabase = createClient(SUPABASE_URL, SERVICE_ROLE);
@@ -74,6 +74,27 @@ Deno.serve(async (req) => {
     }
     console.log("[send-quote-request] DB insert OK");
 
+    // Create signed URLs for uploaded product images (valid 30 days)
+    let imagesHtml = "";
+    if (image_paths?.length) {
+      const links: string[] = [];
+      for (const img of image_paths) {
+        const { data: signed, error: signErr } = await supabase.storage
+          .from("quote-uploads")
+          .createSignedUrl(img.path, 60 * 60 * 24 * 30);
+        if (signErr || !signed?.signedUrl) {
+          console.error("[send-quote-request] sign error:", signErr);
+          continue;
+        }
+        links.push(
+          `<div style="margin-bottom:12px;"><div style="color:#f0b429; font-weight:bold;">${escapeHtml(img.label)}</div><a href="${signed.signedUrl}" style="color:#00d4ff;">${escapeHtml(img.path)}</a><br/><img src="${signed.signedUrl}" alt="${escapeHtml(img.label)}" style="max-width:100%; border-radius:8px; margin-top:6px;" /></div>`
+        );
+      }
+      if (links.length) {
+        imagesHtml = `<div style="margin-top:20px; padding:16px; background:rgba(240,180,41,0.08); border-left:4px solid #f0b429; border-radius:6px;"><div style="color:#f0b429; font-weight:bold; margin-bottom:8px;">Product Images</div>${links.join("")}</div>`;
+      }
+    }
+
     // Send email via Resend (direct API)
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background:#0a0f1e; color:#e6f1ff; border-radius:12px;">
@@ -86,9 +107,10 @@ Deno.serve(async (req) => {
           <tr><td style="padding:8px; color:#f0b429; font-weight:bold;">Budget Range</td><td style="padding:8px;">${escapeHtml(data.budget_range)}</td></tr>
         </table>
         <div style="margin-top:20px; padding:16px; background:rgba(0,212,255,0.08); border-left:4px solid #00d4ff; border-radius:6px;">
-          <div style="color:#f0b429; font-weight:bold; margin-bottom:8px;">Project Description</div>
+          <div style="color:#f0b429; font-weight:bold; margin-bottom:8px;">Project Details</div>
           <div style="white-space:pre-wrap; line-height:1.5;">${escapeHtml(data.project_description)}</div>
         </div>
+        ${imagesHtml}
         <p style="margin-top:24px; color:#7a869a; font-size:12px;">Sent from zapsitestudio.com contact form</p>
       </div>
     `;
