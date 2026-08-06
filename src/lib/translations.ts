@@ -77,14 +77,36 @@ export const translations = {
     contact: {
       title: "Birlikte Harika Bir Şey Yapalım",
       subtitle: "Projenizi anlatın, 24 saat içinde dönüş yapayım.",
-      name: "Ad Soyad",
-      email: "E-posta",
-      phone: "Telefon",
-      type: "Web Sitesi Türü",
+      name: "Adınız ve soyadınız nedir?",
+      namePlaceholder: "örn. Ahmet Mehmet",
+      email: "E-posta adresiniz nedir?",
+      emailPlaceholder: "örn. ahmet@gmail.com",
+      phone: "Telefon numaranız nedir?",
+      phonePlaceholder: "örn. +90 555 123 4567",
+      type: "Ne tür bir web sitesine ihtiyacınız var?",
       typePlaceholder: "Bir tür seçin",
-      budget: "Bütçe Aralığı",
+      domain: "Alan adı (domain) almanıza yardımcı olalım mı?",
+      domainYes: "✅ Evet, alan adı istiyorum",
+      domainNo: "❌ Hayır, teşekkürler",
+      domainLabel: "Hangi alan adını istiyorsunuz?",
+      domainPlaceholder: "örn. mybusiness.com",
+      budget: "Bütçe aralığınız nedir?",
       budgetPlaceholder: "Bir aralık seçin",
-      desc: "Proje Açıklaması",
+      desc: "Bu soruları yanıtlayarak projenizi anlatın:",
+      descTemplate: `1. İşletmeniz ne yapıyor?
+Cevap: 
+
+2. Hedef müşterileriniz kimler?
+Cevap: 
+
+3. Sitenizde hangi sayfalar olsun istiyorsunuz?
+Cevap: 
+
+4. Logonuz veya marka renkleriniz var mı?
+Cevap: 
+
+5. Beğendiğiniz örnek web siteleri var mı?
+Cevap: `,
       submit: "Teklif Al",
       sending: "Gönderiliyor...",
       success: "✅ Teşekkürler! Mesajınız alındı, 24 saat içinde dönüş yapacağım.",
@@ -179,14 +201,36 @@ export const translations = {
     contact: {
       title: "Let's Build Something Great",
       subtitle: "Tell me about your project and I'll get back to you within 24 hours.",
-      name: "Full Name",
-      email: "Email",
-      phone: "Phone",
-      type: "Website Type",
+      name: "What is your full name?",
+      namePlaceholder: "e.g. Ahmed Mohamed",
+      email: "What is your email address?",
+      emailPlaceholder: "e.g. ahmed@gmail.com",
+      phone: "What is your phone number?",
+      phonePlaceholder: "e.g. +90 555 123 4567",
+      type: "What type of website do you need?",
       typePlaceholder: "Select a type",
-      budget: "Budget Range",
+      domain: "Would you like us to help you get a domain?",
+      domainYes: "✅ Yes, I need a domain",
+      domainNo: "❌ No thanks",
+      domainLabel: "What domain name would you like?",
+      domainPlaceholder: "e.g. mybusiness.com",
+      budget: "What is your budget range?",
       budgetPlaceholder: "Select a range",
-      desc: "Project Description",
+      desc: "Tell us about your project by answering these questions:",
+      descTemplate: `1. What does your business do?
+Answer: 
+
+2. Who are your target customers?
+Answer: 
+
+3. What pages do you need on your website?
+Answer: 
+
+4. Do you have a logo or brand colors?
+Answer: 
+
+5. Any websites you like as a reference?
+Answer: `,
       submit: "Get a Quote",
       sending: "Sending...",
       success: "✅ Thank you! I will get back to you within 24 hours.",
@@ -281,14 +325,36 @@ export const translations = {
     contact: {
       title: "لنصنع شيئًا مميزًا معًا",
       subtitle: "أخبرنا عن مشروعك وسنرد عليك خلال 24 ساعة.",
-      name: "الاسم الكامل",
-      email: "البريد الإلكتروني",
-      phone: "رقم الهاتف",
-      type: "نوع الموقع",
+      name: "ما هو اسمك الكامل؟",
+      namePlaceholder: "مثال: أحمد محمد",
+      email: "ما هو بريدك الإلكتروني؟",
+      emailPlaceholder: "مثال: ahmed@gmail.com",
+      phone: "ما هو رقم هاتفك؟",
+      phonePlaceholder: "مثال: ‎+90 555 123 4567",
+      type: "ما نوع الموقع الذي تحتاجه؟",
       typePlaceholder: "اختر نوع الموقع",
-      budget: "الميزانية المتوقعة",
+      domain: "هل ترغب بمساعدتنا في الحصول على نطاق (دومين)؟",
+      domainYes: "✅ نعم، أحتاج نطاقًا",
+      domainNo: "❌ لا، شكرًا",
+      domainLabel: "ما اسم النطاق الذي تريده؟",
+      domainPlaceholder: "مثال: mybusiness.com",
+      budget: "ما هي ميزانيتك المتوقعة؟",
       budgetPlaceholder: "اختر نطاق الميزانية",
-      desc: "وصف المشروع",
+      desc: "أخبرنا عن مشروعك بالإجابة على هذه الأسئلة:",
+      descTemplate: `1. ما هو نشاط عملك؟
+الإجابة: 
+
+2. من هم عملاؤك المستهدفون؟
+الإجابة: 
+
+3. ما الصفحات التي تحتاجها في موقعك؟
+الإجابة: 
+
+4. هل لديك شعار أو ألوان خاصة بعلامتك؟
+الإجابة: 
+
+5. هل هناك مواقع تعجبك كمرجع؟
+الإجابة: `,
       submit: "اطلب عرض السعر",
       sending: "جارٍ الإرسال...",
       success: "✅ شكرًا لك! تم استلام رسالتك وسنرد عليك خلال 24 ساعة.",

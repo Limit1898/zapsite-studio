@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, Phone, Clock, Globe2, Send } from "lucide-react";
 import { z } from "zod";
 import { useI18n } from "@/lib/i18n";
+import { translations } from "@/lib/translations";
 import { usePricing } from "@/lib/usePricing";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,8 +13,10 @@ import { supabase } from "@/integrations/supabase/client";
 
 const EMAIL = "zap.site.studio@gmail.com";
 
+const allTemplates = Object.values(translations).map((v: any) => v.contact.descTemplate as string);
+
 export const Contact = () => {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { priceFmt } = usePricing();
 
   const schema = z.object({
@@ -21,13 +24,34 @@ export const Contact = () => {
     email: z.string().trim().email().max(255),
     phone: z.string().trim().min(5).max(40),
     type: z.string().min(1),
+    domainChoice: z.enum(["yes", "no"]),
+    domain: z.string().trim().max(120),
     budget: z.string().min(1),
     desc: z.string().trim().min(10).max(2000),
   });
 
-  const [form, setForm] = useState({ name: "", email: "", phone: "", type: "", budget: "", desc: "" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    type: "",
+    domainChoice: "",
+    domain: "",
+    budget: "",
+    desc: t.contact.descTemplate,
+  });
   const [errors, setErrors] = useState<Record<string, boolean>>({});
   const [sending, setSending] = useState(false);
+  const descRef = useRef(form.desc);
+  descRef.current = form.desc;
+
+  // Swap the description template when the language changes (if untouched)
+  useEffect(() => {
+    if (allTemplates.includes(descRef.current.trim()) || descRef.current.trim() === "") {
+      setForm((f) => ({ ...f, desc: t.contact.descTemplate }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
 
   const onChange = (k: string, v: string) => {
     setForm((f) => ({ ...f, [k]: v }));
@@ -46,6 +70,10 @@ export const Contact = () => {
     }
     setSending(true);
     try {
+      const domainLine =
+        form.domainChoice === "yes"
+          ? `Domain needed: YES${form.domain ? ` (${form.domain})` : ""}`
+          : "Domain needed: NO";
       const { data, error } = await supabase.functions.invoke("send-quote-request", {
         body: {
           full_name: form.name,
@@ -53,12 +81,12 @@ export const Contact = () => {
           phone: form.phone,
           website_type: form.type,
           budget_range: form.budget,
-          project_description: form.desc,
+          project_description: `${domainLine}\n\n${form.desc}`,
         },
       });
       if (error || (data as any)?.error) throw error || new Error((data as any).error);
       toast.success(t.contact.success, { duration: 6000 });
-      setForm({ name: "", email: "", phone: "", type: "", budget: "", desc: "" });
+      setForm({ name: "", email: "", phone: "", type: "", domainChoice: "", domain: "", budget: "", desc: t.contact.descTemplate });
     } catch (err) {
       console.error("Quote submission failed:", err);
       toast.error(t.contact.error, { duration: 6000 });
@@ -69,10 +97,10 @@ export const Contact = () => {
 
   const types = [
     t.portfolio.filters.landing,
-    t.portfolio.filters.business,
-    t.portfolio.filters.ecom,
     t.portfolio.filters.blog,
     t.portfolio.filters.portfolio,
+    t.portfolio.filters.business,
+    t.portfolio.filters.ecom,
   ];
 
   const budgets = [
@@ -84,6 +112,7 @@ export const Contact = () => {
 
   const fieldClass = (k: string) =>
     `bg-white/5 border-white/10 h-12 rounded-xl ${errors[k] ? "border-destructive ring-1 ring-destructive" : ""}`;
+
 
   return (
     <section id="contact" className="section-pad relative">
@@ -147,18 +176,18 @@ export const Contact = () => {
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-xs text-muted-foreground mb-1.5 block">{t.contact.name} *</label>
-                <Input value={form.name} onChange={(e) => onChange("name", e.target.value)} className={fieldClass("name")} maxLength={100} />
+                <Input value={form.name} onChange={(e) => onChange("name", e.target.value)} placeholder={t.contact.namePlaceholder} className={fieldClass("name")} maxLength={100} />
               </div>
               <div>
                 <label className="text-xs text-muted-foreground mb-1.5 block">{t.contact.email} *</label>
-                <Input type="email" value={form.email} onChange={(e) => onChange("email", e.target.value)} className={fieldClass("email")} maxLength={255} />
+                <Input type="email" value={form.email} onChange={(e) => onChange("email", e.target.value)} placeholder={t.contact.emailPlaceholder} className={fieldClass("email")} maxLength={255} />
               </div>
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-xs text-muted-foreground mb-1.5 block">{t.contact.phone} *</label>
-                <Input value={form.phone} onChange={(e) => onChange("phone", e.target.value)} className={fieldClass("phone")} maxLength={40} />
+                <Input value={form.phone} onChange={(e) => onChange("phone", e.target.value)} placeholder={t.contact.phonePlaceholder} className={fieldClass("phone")} maxLength={40} />
               </div>
               <div>
                 <label className="text-xs text-muted-foreground mb-1.5 block">{t.contact.type} *</label>
@@ -173,6 +202,40 @@ export const Contact = () => {
                   ))}
                 </select>
               </div>
+            </div>
+
+            <div>
+              <label className="text-xs text-muted-foreground mb-1.5 block">{t.contact.domain} *</label>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {(["yes", "no"] as const).map((v) => (
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={() => onChange("domainChoice", v)}
+                    className={`h-12 rounded-xl border px-4 text-sm transition-colors ${
+                      form.domainChoice === v
+                        ? "border-cyan bg-cyan/10 text-cyan"
+                        : errors.domainChoice
+                        ? "border-destructive bg-white/5"
+                        : "border-white/10 bg-white/5 hover:border-cyan/40"
+                    }`}
+                  >
+                    {v === "yes" ? t.contact.domainYes : t.contact.domainNo}
+                  </button>
+                ))}
+              </div>
+              {form.domainChoice === "yes" && (
+                <div className="mt-3">
+                  <label className="text-xs text-muted-foreground mb-1.5 block">{t.contact.domainLabel}</label>
+                  <Input
+                    value={form.domain}
+                    onChange={(e) => onChange("domain", e.target.value)}
+                    placeholder={t.contact.domainPlaceholder}
+                    className={fieldClass("domain")}
+                    maxLength={120}
+                  />
+                </div>
+              )}
             </div>
 
             <div>
@@ -192,10 +255,10 @@ export const Contact = () => {
             <div>
               <label className="text-xs text-muted-foreground mb-1.5 block">{t.contact.desc} *</label>
               <Textarea
-                rows={5}
+                rows={16}
                 value={form.desc}
                 onChange={(e) => onChange("desc", e.target.value)}
-                className={`bg-white/5 border-white/10 rounded-xl resize-none ${errors.desc ? "border-destructive ring-1 ring-destructive" : ""}`}
+                className={`bg-white/5 border-white/10 rounded-xl resize-y min-h-[420px] leading-relaxed ${errors.desc ? "border-destructive ring-1 ring-destructive" : ""}`}
                 maxLength={2000}
               />
             </div>
