@@ -13,6 +13,8 @@ export type QuestionnaireState = {
   q3other: string;
   q4: string;
   q4colors: string;
+  logoFile: File | null;
+  colors: string[];
   q5: "" | "product" | "service";
   productCount: string;
   productCountApprox: string;
@@ -27,6 +29,8 @@ export const emptyQuestionnaire = (): QuestionnaireState => ({
   q3other: "",
   q4: "",
   q4colors: "",
+  logoFile: null,
+  colors: ["", "", ""],
   q5: "",
   productCount: "",
   productCountApprox: "",
@@ -37,6 +41,9 @@ export const emptyQuestionnaire = (): QuestionnaireState => ({
 
 const MAX_FILE = 5 * 1024 * 1024;
 const ACCEPTED = ["image/jpeg", "image/png", "image/webp"];
+const LOGO_ACCEPTED = [...ACCEPTED, "image/svg+xml"];
+
+export const isValidPrice = (v: string) => /\d/.test(v) && /[₺$]/.test(v);
 
 const fade = {
   initial: { opacity: 0, height: 0 },
@@ -84,6 +91,13 @@ export const ProjectQuestionnaire = ({ value, onChange, errors, onFileError }: P
     setProduct(i, { file });
   };
 
+  const pickLogo = (file: File | null) => {
+    if (!file) return set({ logoFile: null });
+    if (!LOGO_ACCEPTED.includes(file.type)) return onFileError(q.logoFileType);
+    if (file.size > MAX_FILE) return onFileError(q.fileTooLarge);
+    set({ logoFile: file });
+  };
+
   const label = (n: number, text: string, required = true) => (
     <div className="text-sm font-medium mb-3">
       <span className="text-cyan me-1">{n}.</span>
@@ -99,6 +113,81 @@ export const ProjectQuestionnaire = ({ value, onChange, errors, onFileError }: P
     `flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm text-start transition-colors ${
       active ? "border-cyan bg-cyan/10 text-cyan" : "border-white/10 bg-white/5 hover:border-cyan/40"
     }`;
+
+  const err = (msg: string) => <p className="text-xs text-destructive mt-1.5">{msg}</p>;
+
+  const inputCls = (bad?: boolean) =>
+    `bg-white/5 h-11 rounded-xl ${bad ? "border-destructive ring-1 ring-destructive" : "border-white/10"}`;
+
+  const needsLogo = value.q4 === q.q4opts[0] || value.q4 === q.q4opts[1];
+  const needsColors = value.q4 === q.q4opts[0];
+
+  const logoBlock = (
+    <div className="mt-3">
+      <label className="text-xs text-muted-foreground mb-1.5 block">
+        {q.uploadLogo} <span className="text-gold">*</span>
+      </label>
+      <label
+        className={`flex items-center gap-3 h-11 rounded-xl border border-dashed bg-white/5 px-3 text-sm cursor-pointer hover:border-cyan/40 transition-colors ${
+          errors.logo ? "border-destructive" : "border-white/15"
+        }`}
+      >
+        <Upload className="h-4 w-4 text-cyan shrink-0" />
+        <span className="truncate text-muted-foreground">{value.logoFile ? value.logoFile.name : q.uploadLogo}</span>
+        <input
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/svg+xml"
+          className="hidden"
+          onChange={(e) => pickLogo(e.target.files?.[0] ?? null)}
+        />
+      </label>
+      {value.logoFile && (
+        <img
+          src={URL.createObjectURL(value.logoFile)}
+          alt="logo preview"
+          className="mt-2 h-20 w-auto rounded-lg border border-white/10 bg-white/5 object-contain p-1"
+        />
+      )}
+      {errors.logo && err(q.logoRequired)}
+    </div>
+  );
+
+  const colorLabels = [q.colorPrimary, q.colorSecondary, q.colorAccent];
+  const colorsBlock = (
+    <div className="mt-4">
+      <label className="text-xs text-muted-foreground mb-2 block">
+        {q.brandColors} <span className="text-gold">*</span>
+      </label>
+      <div className="grid sm:grid-cols-3 gap-3">
+        {colorLabels.map((cl, i) => (
+          <div key={i} className="space-y-1.5">
+            <div className="text-[11px] text-muted-foreground">{cl}</div>
+            <div
+              className={`flex items-center gap-2 rounded-xl border bg-white/5 px-2 h-11 ${
+                errors.colors ? "border-destructive" : "border-white/10"
+              }`}
+            >
+              <input
+                type="color"
+                value={/^#[0-9a-f]{6}$/i.test(value.colors[i] || "") ? value.colors[i] : "#00d4ff"}
+                onChange={(e) => set({ colors: value.colors.map((c, idx) => (idx === i ? e.target.value : c)) })}
+                className="h-7 w-8 rounded cursor-pointer bg-transparent border-0 p-0"
+                aria-label={cl}
+              />
+              <input
+                value={value.colors[i] || ""}
+                onChange={(e) => set({ colors: value.colors.map((c, idx) => (idx === i ? e.target.value : c)) })}
+                placeholder="#000000"
+                maxLength={30}
+                className="flex-1 bg-transparent text-sm outline-none min-w-0"
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+      {errors.colors && err(q.colorsRequired)}
+    </div>
+  );
 
   return (
     <div className="space-y-4">
@@ -116,7 +205,7 @@ export const ProjectQuestionnaire = ({ value, onChange, errors, onFileError }: P
         />
       </div>
 
-      {/* Q3 */}
+      {/* Q2 (pages) */}
       <div className={box(errors.q3)}>
         {label(2, q.q3)}
         <div className="grid sm:grid-cols-2 gap-2">
@@ -144,7 +233,7 @@ export const ProjectQuestionnaire = ({ value, onChange, errors, onFileError }: P
         </AnimatePresence>
       </div>
 
-      {/* Q4 */}
+      {/* Q3 (logo / brand) */}
       <div className={box(errors.q4)}>
         {label(3, q.q4)}
         <div className="grid gap-2">
@@ -155,8 +244,10 @@ export const ProjectQuestionnaire = ({ value, onChange, errors, onFileError }: P
           ))}
         </div>
         <AnimatePresence initial={false}>
-          {(value.q4 === q.q4opts[0] || value.q4 === q.q4opts[1]) && (
-            <motion.div {...fade} className="overflow-hidden">
+          {needsLogo && (
+            <motion.div key="brand" {...fade} className="overflow-hidden">
+              {logoBlock}
+              {needsColors && colorsBlock}
               <Input
                 value={value.q4colors}
                 onChange={(e) => set({ q4colors: e.target.value })}
@@ -169,7 +260,7 @@ export const ProjectQuestionnaire = ({ value, onChange, errors, onFileError }: P
         </AnimatePresence>
       </div>
 
-      {/* Q5 */}
+      {/* Q4 (product / service) */}
       <div className={box(errors.q5)}>
         {label(4, q.q5)}
         <div className="grid sm:grid-cols-2 gap-3">
@@ -225,30 +316,50 @@ export const ProjectQuestionnaire = ({ value, onChange, errors, onFileError }: P
                       className="rounded-xl border border-white/10 bg-white/[0.03] p-4 space-y-3"
                     >
                       <div className="text-sm text-gold font-medium">{q.productLabel} {i + 1}:</div>
-                      <Input
-                        value={p.name}
-                        onChange={(e) => setProduct(i, { name: e.target.value })}
-                        placeholder={q.productNamePh}
-                        maxLength={120}
-                        className="bg-white/5 border-white/10 h-11 rounded-xl"
-                      />
-                      <Input
-                        value={p.price}
-                        onChange={(e) => setProduct(i, { price: e.target.value })}
-                        placeholder={q.pricePh}
-                        maxLength={60}
-                        className="bg-white/5 border-white/10 h-11 rounded-xl"
-                      />
-                      <label className="flex items-center gap-3 h-11 rounded-xl border border-dashed border-white/15 bg-white/5 px-3 text-sm cursor-pointer hover:border-cyan/40 transition-colors">
-                        <Upload className="h-4 w-4 text-cyan shrink-0" />
-                        <span className="truncate text-muted-foreground">{p.file ? p.file.name : q.uploadImage}</span>
-                        <input
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp"
-                          className="hidden"
-                          onChange={(e) => pickFile(i, e.target.files?.[0] ?? null)}
+                      <div>
+                        <Input
+                          value={p.name}
+                          onChange={(e) => setProduct(i, { name: e.target.value })}
+                          placeholder={q.productNamePh}
+                          maxLength={120}
+                          className={inputCls(errors[`p${i}name`])}
                         />
-                      </label>
+                        {errors[`p${i}name`] && err(q.errProductName)}
+                      </div>
+                      <div>
+                        <Input
+                          value={p.price}
+                          onChange={(e) => setProduct(i, { price: e.target.value })}
+                          placeholder={q.pricePh}
+                          maxLength={60}
+                          className={inputCls(errors[`p${i}price`])}
+                        />
+                        {errors[`p${i}price`] && err(q.errProductPrice)}
+                      </div>
+                      <div>
+                        <label
+                          className={`flex items-center gap-3 h-11 rounded-xl border border-dashed bg-white/5 px-3 text-sm cursor-pointer hover:border-cyan/40 transition-colors ${
+                            errors[`p${i}file`] ? "border-destructive" : "border-white/15"
+                          }`}
+                        >
+                          <Upload className="h-4 w-4 text-cyan shrink-0" />
+                          <span className="truncate text-muted-foreground">{p.file ? p.file.name : q.uploadImage}</span>
+                          <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                            className="hidden"
+                            onChange={(e) => pickFile(i, e.target.files?.[0] ?? null)}
+                          />
+                        </label>
+                        {p.file && (
+                          <img
+                            src={URL.createObjectURL(p.file)}
+                            alt={p.name || `product ${i + 1}`}
+                            className="mt-2 h-24 w-24 rounded-lg border border-white/10 object-cover"
+                          />
+                        )}
+                        {errors[`p${i}file`] && err(q.errProductImage)}
+                      </div>
                     </motion.div>
                   ))}
                 </div>
@@ -278,20 +389,26 @@ export const ProjectQuestionnaire = ({ value, onChange, errors, onFileError }: P
                       </button>
                     )}
                     <div className="text-sm text-gold font-medium">{q.serviceName} {i + 1}:</div>
-                    <Input
-                      value={s.name}
-                      onChange={(e) => set({ services: value.services.map((x, idx) => (idx === i ? { ...x, name: e.target.value } : x)) })}
-                      placeholder={q.serviceNamePh}
-                      maxLength={120}
-                      className="bg-white/5 border-white/10 h-11 rounded-xl"
-                    />
-                    <Input
-                      value={s.price}
-                      onChange={(e) => set({ services: value.services.map((x, idx) => (idx === i ? { ...x, price: e.target.value } : x)) })}
-                      placeholder={q.servicePricePh}
-                      maxLength={60}
-                      className="bg-white/5 border-white/10 h-11 rounded-xl"
-                    />
+                    <div>
+                      <Input
+                        value={s.name}
+                        onChange={(e) => set({ services: value.services.map((x, idx) => (idx === i ? { ...x, name: e.target.value } : x)) })}
+                        placeholder={q.serviceNamePh}
+                        maxLength={120}
+                        className={inputCls(errors[`s${i}name`])}
+                      />
+                      {errors[`s${i}name`] && err(q.errServiceName)}
+                    </div>
+                    <div>
+                      <Input
+                        value={s.price}
+                        onChange={(e) => set({ services: value.services.map((x, idx) => (idx === i ? { ...x, price: e.target.value } : x)) })}
+                        placeholder={q.servicePricePh}
+                        maxLength={60}
+                        className={inputCls(errors[`s${i}price`])}
+                      />
+                      {errors[`s${i}price`] && err(q.errServicePrice)}
+                    </div>
                   </motion.div>
                 ))}
               </div>
@@ -311,7 +428,7 @@ export const ProjectQuestionnaire = ({ value, onChange, errors, onFileError }: P
         </AnimatePresence>
       </div>
 
-      {/* Q6 */}
+      {/* Q5 */}
       <div className={box(false)}>
         {label(5, q.q6, false)}
         <Input
