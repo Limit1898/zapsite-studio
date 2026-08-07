@@ -132,7 +132,10 @@ export const Contact = () => {
     setSending(true);
     try {
       const image_paths: { label: string; path: string }[] = [];
-      const files = q.products.map((p, i) => ({ file: p.file, label: `${p.name || `Product ${i + 1}`}` })).filter((f) => f.file);
+      const files = [
+        ...(q.logoFile ? [{ file: q.logoFile, label: "Logo" }] : []),
+        ...q.products.map((p, i) => ({ file: p.file, label: `${p.name || `Product ${i + 1}`}` })),
+      ].filter((f) => f.file);
       if (files.length) {
         toast.info((t.contact as any).q.uploading);
         for (const f of files) {
