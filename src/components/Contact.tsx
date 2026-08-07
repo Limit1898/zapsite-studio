@@ -135,6 +135,7 @@ export const Contact = () => {
       toast.success(t.contact.success, { duration: 6000 });
       setForm({ name: "", email: "", phone: "", type: "", domainChoice: "", domain: "", budget: "" });
       setQ(emptyQuestionnaire());
+      setDomainTouched(false);
       setErrors({});
     } catch (err) {
       console.error("Quote submission failed:", err);
