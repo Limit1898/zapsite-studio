@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { ProjectQuestionnaire, emptyQuestionnaire, QuestionnaireState } from "@/components/ProjectQuestionnaire";
+import { ProjectQuestionnaire, emptyQuestionnaire, QuestionnaireState, isValidPrice } from "@/components/ProjectQuestionnaire";
 
 const EMAIL = "zap.site.studio@gmail.com";
 
@@ -59,8 +59,11 @@ export const Contact = () => {
       `1. Business does: ${q.q1}`,
       `2. Pages needed: ${q3}`,
       `3. Logo / brand colors: ${q.q4}${q.q4colors ? ` — ${q.q4colors}` : ""}`,
-      `4. Offering: ${q.q5 === "product" ? "Product" : "Service"}`,
     ];
+    const picked = q.colors.filter((c) => c.trim());
+    if (picked.length) lines.push(`   Brand colors: ${picked.join(", ")}`);
+    if (q.logoFile) lines.push(`   Logo file: ${q.logoFile.name}`);
+    lines.push(`4. Offering: ${q.q5 === "product" ? "Product" : "Service"}`);
     if (q.q5 === "product") {
       if (q.productCount === "10+") {
         lines.push(`   Products: 10+ (approx: ${q.productCountApprox || "n/a"}) — full list to be collected`);
@@ -77,14 +80,33 @@ export const Contact = () => {
 
   const validate = () => {
     const errs: Record<string, boolean> = {};
+    const qt = (t.contact as any).q;
     const r = schema.safeParse(form);
     if (!r.success) r.error.issues.forEach((i) => (errs[i.path[0] as string] = true));
     if (!q.q1.trim()) errs.q1 = true;
     if (q.q3.length === 0) errs.q3 = true;
     if (!q.q4) errs.q4 = true;
+    if (q.q4 === qt.q4opts[0] || q.q4 === qt.q4opts[1]) {
+      if (!q.logoFile) errs.logo = true;
+    }
+    if (q.q4 === qt.q4opts[0] && !q.colors.some((c) => c.trim())) errs.colors = true;
     if (!q.q5) errs.q5 = true;
-    if (q.q5 === "product" && !q.productCount) errs.q5 = true;
-    if (q.q5 === "service" && !q.services.some((s) => s.name.trim())) errs.q5 = true;
+    if (q.q5 === "product") {
+      if (!q.productCount) errs.q5 = true;
+      if (q.productCount && q.productCount !== "10+") {
+        q.products.forEach((p, i) => {
+          if (!p.name.trim()) errs[`p${i}name`] = true;
+          if (!isValidPrice(p.price)) errs[`p${i}price`] = true;
+          if (!p.file) errs[`p${i}file`] = true;
+        });
+      }
+    }
+    if (q.q5 === "service") {
+      q.services.forEach((s, i) => {
+        if (!s.name.trim()) errs[`s${i}name`] = true;
+        if (!isValidPrice(s.price)) errs[`s${i}price`] = true;
+      });
+    }
     if (form.domainChoice === "yes" && !domainIsValid) errs.domain = true;
     return errs;
   };
@@ -94,19 +116,26 @@ export const Contact = () => {
     const errs = validate();
     if (Object.keys(errs).length) {
       setErrors(errs);
-      if (errs.domain) {
-        setDomainTouched(true);
-        domainRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-        domainRef.current?.focus({ preventScroll: true });
-      }
+      if (errs.domain) setDomainTouched(true);
+      setTimeout(() => {
+        const first = document.querySelector("#contact form .border-destructive") as HTMLElement | null;
+        if (first) {
+          first.scrollIntoView({ behavior: "smooth", block: "center" });
+          (first.querySelector("input,select,textarea") as HTMLElement | null)?.focus({ preventScroll: true });
+        }
+      }, 0);
       toast.error(t.contact.error);
       return;
     }
 
+
     setSending(true);
     try {
       const image_paths: { label: string; path: string }[] = [];
-      const files = q.products.map((p, i) => ({ file: p.file, label: `${p.name || `Product ${i + 1}`}` })).filter((f) => f.file);
+      const files = [
+        ...(q.logoFile ? [{ file: q.logoFile, label: "Logo" }] : []),
+        ...q.products.map((p, i) => ({ file: p.file, label: `${p.name || `Product ${i + 1}`}` })),
+      ].filter((f) => f.file);
       if (files.length) {
         toast.info((t.contact as any).q.uploading);
         for (const f of files) {
