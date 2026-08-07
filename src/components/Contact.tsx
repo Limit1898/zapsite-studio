@@ -245,7 +245,13 @@ export const Contact = () => {
                   <button
                     key={v}
                     type="button"
-                    onClick={() => onChange("domainChoice", v)}
+                    onClick={() => {
+                      onChange("domainChoice", v);
+                      if (v === "no") {
+                        setDomainTouched(false);
+                        setErrors((e) => ({ ...e, domain: false }));
+                      }
+                    }}
                     className={`h-12 rounded-xl border px-4 text-sm transition-colors ${
                       form.domainChoice === v
                         ? "border-cyan bg-cyan/10 text-cyan"
@@ -260,17 +266,31 @@ export const Contact = () => {
               </div>
               {form.domainChoice === "yes" && (
                 <div className="mt-3">
-                  <label className="text-xs text-muted-foreground mb-1.5 block">{t.contact.domainLabel}</label>
+                  <label className="text-xs text-muted-foreground mb-1.5 block">{t.contact.domainLabel} *</label>
                   <Input
+                    ref={domainRef}
                     value={form.domain}
                     onChange={(e) => onChange("domain", e.target.value)}
+                    onBlur={() => setDomainTouched(true)}
                     placeholder={t.contact.domainPlaceholder}
                     className={fieldClass("domain")}
                     maxLength={120}
+                    inputMode="url"
+                    autoCapitalize="none"
+                    spellCheck={false}
                   />
+                  {(domainTouched || errors.domain) && form.domain.trim() !== "" && (
+                    <p className={`text-xs mt-2 ${domainIsValid ? "text-emerald-400" : "text-destructive"}`}>
+                      {domainIsValid ? (t.contact as any).domainValid : (t.contact as any).domainInvalid}
+                    </p>
+                  )}
+                  {(domainTouched || errors.domain) && form.domain.trim() === "" && (
+                    <p className="text-xs mt-2 text-destructive">{(t.contact as any).domainInvalid}</p>
+                  )}
                 </div>
               )}
             </div>
+
 
             <div>
               <label className="text-xs text-muted-foreground mb-1.5 block">{t.contact.budget} *</label>
