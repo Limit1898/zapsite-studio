@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { Mail, Phone, Clock, Globe2, Send } from "lucide-react";
 import { z } from "zod";
