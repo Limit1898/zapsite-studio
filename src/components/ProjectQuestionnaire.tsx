@@ -9,8 +9,6 @@ export type ServiceEntry = { name: string; price: string };
 
 export type QuestionnaireState = {
   q1: string;
-  q2: string[];
-  q2other: string;
   q3: string[];
   q3other: string;
   q4: string;
@@ -25,8 +23,6 @@ export type QuestionnaireState = {
 
 export const emptyQuestionnaire = (): QuestionnaireState => ({
   q1: "",
-  q2: [],
-  q2other: "",
   q3: [],
   q3other: "",
   q4: "",
@@ -61,7 +57,7 @@ export const ProjectQuestionnaire = ({ value, onChange, errors, onFileError }: P
   const q = (t.contact as any).q;
   const set = (patch: Partial<QuestionnaireState>) => onChange({ ...value, ...patch });
 
-  const toggle = (key: "q2" | "q3", opt: string) => {
+  const toggle = (key: "q3", opt: string) => {
     const list = value[key];
     set({ [key]: list.includes(opt) ? list.filter((o) => o !== opt) : [...list, opt] } as any);
   };
@@ -120,37 +116,9 @@ export const ProjectQuestionnaire = ({ value, onChange, errors, onFileError }: P
         />
       </div>
 
-      {/* Q2 */}
-      <div className={box(errors.q2)}>
-        {label(2, q.q2)}
-        <div className="grid sm:grid-cols-2 gap-2">
-          {q.q2opts.map((opt: string) => (
-            <button key={opt} type="button" onClick={() => toggle("q2", opt)} className={chip(value.q2.includes(opt))}>
-              <span className={`h-4 w-4 rounded border grid place-items-center shrink-0 ${value.q2.includes(opt) ? "border-cyan bg-cyan/20" : "border-white/20"}`}>
-                {value.q2.includes(opt) && <Check className="h-3 w-3" />}
-              </span>
-              {opt}
-            </button>
-          ))}
-        </div>
-        <AnimatePresence initial={false}>
-          {value.q2.includes(q.q2opts[6]) && (
-            <motion.div {...fade} className="overflow-hidden">
-              <Input
-                value={value.q2other}
-                onChange={(e) => set({ q2other: e.target.value })}
-                placeholder={q.otherPh}
-                maxLength={200}
-                className="bg-white/5 border-white/10 h-12 rounded-xl mt-3"
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
       {/* Q3 */}
       <div className={box(errors.q3)}>
-        {label(3, q.q3)}
+        {label(2, q.q3)}
         <div className="grid sm:grid-cols-2 gap-2">
           {q.q3opts.map((opt: string) => (
             <button key={opt} type="button" onClick={() => toggle("q3", opt)} className={chip(value.q3.includes(opt))}>
@@ -178,7 +146,7 @@ export const ProjectQuestionnaire = ({ value, onChange, errors, onFileError }: P
 
       {/* Q4 */}
       <div className={box(errors.q4)}>
-        {label(4, q.q4)}
+        {label(3, q.q4)}
         <div className="grid gap-2">
           {q.q4opts.map((opt: string) => (
             <button key={opt} type="button" onClick={() => set({ q4: opt })} className={chip(value.q4 === opt)}>
@@ -203,7 +171,7 @@ export const ProjectQuestionnaire = ({ value, onChange, errors, onFileError }: P
 
       {/* Q5 */}
       <div className={box(errors.q5)}>
-        {label(5, q.q5)}
+        {label(4, q.q5)}
         <div className="grid sm:grid-cols-2 gap-3">
           {(["product", "service"] as const).map((k) => (
             <button
@@ -345,7 +313,7 @@ export const ProjectQuestionnaire = ({ value, onChange, errors, onFileError }: P
 
       {/* Q6 */}
       <div className={box(false)}>
-        {label(6, q.q6, false)}
+        {label(5, q.q6, false)}
         <Input
           value={value.q6}
           onChange={(e) => set({ q6: e.target.value })}
