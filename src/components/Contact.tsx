@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { ProjectQuestionnaire, emptyQuestionnaire, QuestionnaireState } from "@/components/ProjectQuestionnaire";
+import { ProjectQuestionnaire, emptyQuestionnaire, QuestionnaireState, isValidPrice } from "@/components/ProjectQuestionnaire";
 
 const EMAIL = "zap.site.studio@gmail.com";
 
