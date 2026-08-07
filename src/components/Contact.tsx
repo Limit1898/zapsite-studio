@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { Mail, Phone, Clock, Globe2, Send } from "lucide-react";
 import { z } from "zod";
@@ -38,11 +38,18 @@ export const Contact = () => {
   const [q, setQ] = useState<QuestionnaireState>(emptyQuestionnaire());
   const [errors, setErrors] = useState<Record<string, boolean>>({});
   const [sending, setSending] = useState(false);
+  const [domainTouched, setDomainTouched] = useState(false);
+  const domainRef = useRef<HTMLInputElement>(null);
+
+  const DOMAIN_RE = /^(?!-)[a-z0-9-]{3,63}(?<!-)(\.[a-z0-9-]{2,63})*\.(com|net|org|io|dev|co|studio|app|store|online|site|web|tech|design)$/i;
+  const isValidDomain = (v: string) => DOMAIN_RE.test(v.trim().replace(/^https?:\/\//i, "").replace(/\/.*$/, ""));
+  const domainIsValid = isValidDomain(form.domain);
 
   const onChange = (k: string, v: string) => {
     setForm((f) => ({ ...f, [k]: v }));
     if (errors[k]) setErrors((e) => ({ ...e, [k]: false }));
   };
+
 
   const buildDescription = () => {
     const q3 = [...q.q3.filter((o) => o !== (t.contact as any).q.q3opts[8]), q.q3other && `Other: ${q.q3other}`].filter(Boolean).join(", ");
@@ -78,6 +85,7 @@ export const Contact = () => {
     if (!q.q5) errs.q5 = true;
     if (q.q5 === "product" && !q.productCount) errs.q5 = true;
     if (q.q5 === "service" && !q.services.some((s) => s.name.trim())) errs.q5 = true;
+    if (form.domainChoice === "yes" && !domainIsValid) errs.domain = true;
     return errs;
   };
 
@@ -86,9 +94,15 @@ export const Contact = () => {
     const errs = validate();
     if (Object.keys(errs).length) {
       setErrors(errs);
+      if (errs.domain) {
+        setDomainTouched(true);
+        domainRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+        domainRef.current?.focus({ preventScroll: true });
+      }
       toast.error(t.contact.error);
       return;
     }
+
     setSending(true);
     try {
       const image_paths: { label: string; path: string }[] = [];
@@ -121,6 +135,7 @@ export const Contact = () => {
       toast.success(t.contact.success, { duration: 6000 });
       setForm({ name: "", email: "", phone: "", type: "", domainChoice: "", domain: "", budget: "" });
       setQ(emptyQuestionnaire());
+      setDomainTouched(false);
       setErrors({});
     } catch (err) {
       console.error("Quote submission failed:", err);
@@ -245,7 +260,13 @@ export const Contact = () => {
                   <button
                     key={v}
                     type="button"
-                    onClick={() => onChange("domainChoice", v)}
+                    onClick={() => {
+                      onChange("domainChoice", v);
+                      if (v === "no") {
+                        setDomainTouched(false);
+                        setErrors((e) => ({ ...e, domain: false }));
+                      }
+                    }}
                     className={`h-12 rounded-xl border px-4 text-sm transition-colors ${
                       form.domainChoice === v
                         ? "border-cyan bg-cyan/10 text-cyan"
@@ -260,17 +281,31 @@ export const Contact = () => {
               </div>
               {form.domainChoice === "yes" && (
                 <div className="mt-3">
-                  <label className="text-xs text-muted-foreground mb-1.5 block">{t.contact.domainLabel}</label>
+                  <label className="text-xs text-muted-foreground mb-1.5 block">{t.contact.domainLabel} *</label>
                   <Input
+                    ref={domainRef}
                     value={form.domain}
                     onChange={(e) => onChange("domain", e.target.value)}
+                    onBlur={() => setDomainTouched(true)}
                     placeholder={t.contact.domainPlaceholder}
                     className={fieldClass("domain")}
                     maxLength={120}
+                    inputMode="url"
+                    autoCapitalize="none"
+                    spellCheck={false}
                   />
+                  {(domainTouched || errors.domain) && form.domain.trim() !== "" && (
+                    <p className={`text-xs mt-2 ${domainIsValid ? "text-emerald-400" : "text-destructive"}`}>
+                      {domainIsValid ? (t.contact as any).domainValid : (t.contact as any).domainInvalid}
+                    </p>
+                  )}
+                  {(domainTouched || errors.domain) && form.domain.trim() === "" && (
+                    <p className="text-xs mt-2 text-destructive">{(t.contact as any).domainInvalid}</p>
+                  )}
                 </div>
               )}
             </div>
+
 
             <div>
               <label className="text-xs text-muted-foreground mb-1.5 block">{t.contact.budget} *</label>
