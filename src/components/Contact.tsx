@@ -85,6 +85,7 @@ export const Contact = () => {
     if (!q.q5) errs.q5 = true;
     if (q.q5 === "product" && !q.productCount) errs.q5 = true;
     if (q.q5 === "service" && !q.services.some((s) => s.name.trim())) errs.q5 = true;
+    if (form.domainChoice === "yes" && !domainIsValid) errs.domain = true;
     return errs;
   };
 
@@ -93,9 +94,15 @@ export const Contact = () => {
     const errs = validate();
     if (Object.keys(errs).length) {
       setErrors(errs);
+      if (errs.domain) {
+        setDomainTouched(true);
+        domainRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+        domainRef.current?.focus({ preventScroll: true });
+      }
       toast.error(t.contact.error);
       return;
     }
+
     setSending(true);
     try {
       const image_paths: { label: string; path: string }[] = [];
