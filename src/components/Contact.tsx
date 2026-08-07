@@ -80,14 +80,33 @@ export const Contact = () => {
 
   const validate = () => {
     const errs: Record<string, boolean> = {};
+    const qt = (t.contact as any).q;
     const r = schema.safeParse(form);
     if (!r.success) r.error.issues.forEach((i) => (errs[i.path[0] as string] = true));
     if (!q.q1.trim()) errs.q1 = true;
     if (q.q3.length === 0) errs.q3 = true;
     if (!q.q4) errs.q4 = true;
+    if (q.q4 === qt.q4opts[0] || q.q4 === qt.q4opts[1]) {
+      if (!q.logoFile) errs.logo = true;
+    }
+    if (q.q4 === qt.q4opts[0] && !q.colors.some((c) => c.trim())) errs.colors = true;
     if (!q.q5) errs.q5 = true;
-    if (q.q5 === "product" && !q.productCount) errs.q5 = true;
-    if (q.q5 === "service" && !q.services.some((s) => s.name.trim())) errs.q5 = true;
+    if (q.q5 === "product") {
+      if (!q.productCount) errs.q5 = true;
+      if (q.productCount && q.productCount !== "10+") {
+        q.products.forEach((p, i) => {
+          if (!p.name.trim()) errs[`p${i}name`] = true;
+          if (!isValidPrice(p.price)) errs[`p${i}price`] = true;
+          if (!p.file) errs[`p${i}file`] = true;
+        });
+      }
+    }
+    if (q.q5 === "service") {
+      q.services.forEach((s, i) => {
+        if (!s.name.trim()) errs[`s${i}name`] = true;
+        if (!isValidPrice(s.price)) errs[`s${i}price`] = true;
+      });
+    }
     if (form.domainChoice === "yes" && !domainIsValid) errs.domain = true;
     return errs;
   };
@@ -97,14 +116,18 @@ export const Contact = () => {
     const errs = validate();
     if (Object.keys(errs).length) {
       setErrors(errs);
-      if (errs.domain) {
-        setDomainTouched(true);
-        domainRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-        domainRef.current?.focus({ preventScroll: true });
-      }
+      if (errs.domain) setDomainTouched(true);
+      setTimeout(() => {
+        const first = document.querySelector("#contact form .border-destructive") as HTMLElement | null;
+        if (first) {
+          first.scrollIntoView({ behavior: "smooth", block: "center" });
+          (first.querySelector("input,select,textarea") as HTMLElement | null)?.focus({ preventScroll: true });
+        }
+      }, 0);
       toast.error(t.contact.error);
       return;
     }
+
 
     setSending(true);
     try {
