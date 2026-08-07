@@ -59,8 +59,11 @@ export const Contact = () => {
       `1. Business does: ${q.q1}`,
       `2. Pages needed: ${q3}`,
       `3. Logo / brand colors: ${q.q4}${q.q4colors ? ` — ${q.q4colors}` : ""}`,
-      `4. Offering: ${q.q5 === "product" ? "Product" : "Service"}`,
     ];
+    const picked = q.colors.filter((c) => c.trim());
+    if (picked.length) lines.push(`   Brand colors: ${picked.join(", ")}`);
+    if (q.logoFile) lines.push(`   Logo file: ${q.logoFile.name}`);
+    lines.push(`4. Offering: ${q.q5 === "product" ? "Product" : "Service"}`);
     if (q.q5 === "product") {
       if (q.productCount === "10+") {
         lines.push(`   Products: 10+ (approx: ${q.productCountApprox || "n/a"}) — full list to be collected`);
