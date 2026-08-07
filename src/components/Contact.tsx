@@ -38,11 +38,18 @@ export const Contact = () => {
   const [q, setQ] = useState<QuestionnaireState>(emptyQuestionnaire());
   const [errors, setErrors] = useState<Record<string, boolean>>({});
   const [sending, setSending] = useState(false);
+  const [domainTouched, setDomainTouched] = useState(false);
+  const domainRef = useRef<HTMLInputElement>(null);
+
+  const DOMAIN_RE = /^(?!-)[a-z0-9-]{3,63}(?<!-)(\.[a-z0-9-]{2,63})*\.(com|net|org|io|dev|co|studio|app|store|online|site|web|tech|design)$/i;
+  const isValidDomain = (v: string) => DOMAIN_RE.test(v.trim().replace(/^https?:\/\//i, "").replace(/\/.*$/, ""));
+  const domainIsValid = isValidDomain(form.domain);
 
   const onChange = (k: string, v: string) => {
     setForm((f) => ({ ...f, [k]: v }));
     if (errors[k]) setErrors((e) => ({ ...e, [k]: false }));
   };
+
 
   const buildDescription = () => {
     const q3 = [...q.q3.filter((o) => o !== (t.contact as any).q.q3opts[8]), q.q3other && `Other: ${q.q3other}`].filter(Boolean).join(", ");
