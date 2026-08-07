@@ -45,16 +45,14 @@ export const Contact = () => {
   };
 
   const buildDescription = () => {
-    const q2 = [...q.q2.filter((o) => o !== (t.contact as any).q.q2opts[6]), q.q2other && `Other: ${q.q2other}`].filter(Boolean).join(", ");
     const q3 = [...q.q3.filter((o) => o !== (t.contact as any).q.q3opts[8]), q.q3other && `Other: ${q.q3other}`].filter(Boolean).join(", ");
     const lines = [
       `Domain needed: ${form.domainChoice === "yes" ? `YES${form.domain ? ` (${form.domain})` : ""}` : "NO"}`,
       "",
       `1. Business does: ${q.q1}`,
-      `2. Target customers: ${q2}`,
-      `3. Pages needed: ${q3}`,
-      `4. Logo / brand colors: ${q.q4}${q.q4colors ? ` — ${q.q4colors}` : ""}`,
-      `5. Offering: ${q.q5 === "product" ? "Product" : "Service"}`,
+      `2. Pages needed: ${q3}`,
+      `3. Logo / brand colors: ${q.q4}${q.q4colors ? ` — ${q.q4colors}` : ""}`,
+      `4. Offering: ${q.q5 === "product" ? "Product" : "Service"}`,
     ];
     if (q.q5 === "product") {
       if (q.productCount === "10+") {
@@ -66,7 +64,7 @@ export const Contact = () => {
     } else if (q.q5 === "service") {
       q.services.forEach((s, i) => lines.push(`   Service ${i + 1}: ${s.name || "-"} | ${s.price || "-"}`));
     }
-    lines.push(`6. Reference websites: ${q.q6 || "-"}`);
+    lines.push(`5. Reference websites: ${q.q6 || "-"}`);
     return lines.join("\n");
   };
 
@@ -75,7 +73,6 @@ export const Contact = () => {
     const r = schema.safeParse(form);
     if (!r.success) r.error.issues.forEach((i) => (errs[i.path[0] as string] = true));
     if (!q.q1.trim()) errs.q1 = true;
-    if (q.q2.length === 0) errs.q2 = true;
     if (q.q3.length === 0) errs.q3 = true;
     if (!q.q4) errs.q4 = true;
     if (!q.q5) errs.q5 = true;
