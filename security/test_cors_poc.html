@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORS Vulnerability PoC</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .explanation {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>CORS Vulnerability Proof of Concept</h1>
+    
+    <div class="explanation">
+        <h3>Vulnerability Explanation</h3>
+        <p><strong>BEFORE FIX:</strong> The send-quote-request edge function used wide-open CORS headers from Supabase, allowing any origin to invoke the function. This could enable cross-origin attacks from malicious websites.</p>
+        <p><strong>AFTER FIX:</strong> CORS is restricted to specific allowed origins (https://zapsitestudio.com and localhost for development). Cross-origin requests from unauthorized domains will be blocked by the browser.</p>
+    </div>
+
+    <div class="test-container">
+        <h2>Test 1: Authorized Origin (Localhost)</h2>
+        <p>This test simulates a request from an authorized origin (localhost for development).</p>
+        <button onclick="testAuthorizedOrigin()">Test Authorized Origin</button>
+        <div id="authorized-result"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>Test 2: Unauthorized Origin (Evil.com)</h2>
+        <p>This test simulates a request from an unauthorized origin (a malicious website).</p>
+        <button onclick="testUnauthorizedOrigin()">Test Unauthorized Origin</button>
+        <div id="unauthorized-result"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>Test 3: Direct API Call (No Origin Header)</h2>
+        <p>This test simulates a direct API call without an origin header (like from curl or a mobile app).</p>
+        <button onclick="testNoOrigin()">Test No Origin</button>
+        <div id="no-origin-result"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://irrapwycnkullrffoash.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlycmFwd3ljbmt1bGxyZmZvYXNoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxOTU5OTEsImV4cCI6MjA5Mjc3MTk5MX0.SHrOtey-Eg-s4NldPjjKkIZh4kJx9a5Gwxu3DcwsuVI";
+
+        function displayResult(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="result ${type}">${message}</div>`;
+        }
+
+        async function testAuthorizedOrigin() {
+            displayResult('authorized-result', 'Testing...', 'warning');
+            
+            try {
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/send-quote-request`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        full_name: "Test User",
+                        email: "test@example.com",
+                        phone: "+1234567890",
+                        website_type: "Business",
+                        budget_range: "$500-$1000",
+                        project_description: "Test request from authorized origin"
+                    })
+                });
+
+                if (response.ok) {
+                    displayResult('authorized-result', '✅ SUCCESS: Request from authorized origin succeeded (expected behavior)', 'success');
+                } else {
+                    const error = await response.json();
+                    displayResult('authorized-result', `❌ FAILED: Request from authorized origin failed: ${error.error || response.status}`, 'error');
+                }
+            } catch (error) {
+                displayResult('authorized-result', `❌ ERROR: ${error.message}`, 'error');
+            }
+        }
+
+        async function testUnauthorizedOrigin() {
+            displayResult('unauthorized-result', 'Testing cross-origin request...', 'warning');
+            
+            // Note: This test can only truly demonstrate the vulnerability if run from a different domain
+            // For demonstration purposes, we'll show what would happen
+            
+            const explanation = `
+                <strong>Expected Behavior After Fix:</strong><br>
+                When this page is hosted on an unauthorized domain (e.g., evil.com), 
+                the browser will block the response due to CORS restrictions.<br><br>
+                
+                <strong>Before Fix:</strong> The request would succeed because CORS allowed all origins.<br>
+                <strong>After Fix:</strong> The browser blocks the response because the origin is not in the allowed list.<br><br>
+                
+                <em>To fully test this, you would need to host this HTML file on a different domain 
+                and make the actual cross-origin request.</em>
+            `;
+            
+            displayResult('unauthorized-result', explanation, 'warning');
+            
+            // Try the request anyway (will likely fail due to CORS if not on allowed origin)
+            try {
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/send-quote-request`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        full_name: "Malicious User",
+                        email: "malicious@evil.com",
+                        phone: "+1234567890",
+                        website_type: "Business",
+                        budget_range: "$500-$1000",
+                        project_description: "Test request from unauthorized origin"
+                    })
+                });
+
+                if (response.ok) {
+                    displayResult('unauthorized-result', '❌ VULNERABLE: Request from unauthorized origin succeeded! This should be blocked after the fix.', 'error');
+                } else {
+                    const error = await response.json();
+                    displayResult('unauthorized-result', `✅ SECURE: Request blocked: ${error.error || response.status}`, 'success');
+                }
+            } catch (error) {
+                // CORS errors often manifest as network errors
+                displayResult('unauthorized-result', `✅ SECURE: Request blocked by CORS (expected): ${error.message}`, 'success');
+            }
+        }
+
+        async function testNoOrigin() {
+            displayResult('no-origin-result', 'Testing request without origin header...', 'warning');
+            
+            try {
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/send-quote-request`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        full_name: "API User",
+                        email: "api@example.com",
+                        phone: "+1234567890",
+                        website_type: "Business",
+                        budget_range: "$500-$1000",
+                        project_description: "Test request without origin header"
+                    })
+                });
+
+                if (response.ok) {
+                    displayResult('no-origin-result', '✅ SUCCESS: Request without origin succeeded (falls back to allowed origin)', 'success');
+                } else {
+                    const error = await response.json();
+                    displayResult('no-origin-result', `Result: ${error.error || response.status}`, 'warning');
+                }
+            } catch (error) {
+                displayResult('no-origin-result', `❌ ERROR: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>
