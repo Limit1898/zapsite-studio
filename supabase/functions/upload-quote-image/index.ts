@@ -8,7 +8,6 @@ const ALLOWED_ORIGINS = [
   "https://zapsitestudio.com",
   "http://localhost:5173", // for local development
   "http://localhost:3000",  // alternative local dev port
-  "http://localhost:8788",  // Cloudflare Pages local dev
 ];
 
 function getCorsHeaders(origin: string | null): Record<string, string> {
