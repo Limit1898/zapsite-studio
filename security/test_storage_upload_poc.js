@@ -17,8 +17,8 @@
  * Usage: node test_storage_upload_poc.js
  */
 
-const SUPABASE_URL = "https://irrapwycnkullrffoash.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlycmFwd3ljbmt1bGxyZmZvYXNoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxOTU5OTEsImV4cCI6MjA5Mjc3MTk5MX0.SHrOtey-Eg-s4NldPjjKkIZh4kJx9a5Gwxu3DcwsuVI";
+const SUPABASE_URL = "https://jiwjxfuozysmbncwznoe.supabase.co";
+const SUPABASE_ANON_KEY = "your-anon-key-here"; // Replace with your actual anon key
 
 async function testUploadVulnerability() {
   console.log("=== Storage Upload Vulnerability PoC ===\n");
