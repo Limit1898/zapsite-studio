@@ -6,6 +6,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 // Restrict CORS to production origin only
 const ALLOWED_ORIGINS = [
   "https://zapsitestudio.com",
+  "https://spiffy-manatee-d0fda6.netlify.app",
   "http://localhost:5173", // for local development
   "http://localhost:3000",  // alternative local dev port
 ];

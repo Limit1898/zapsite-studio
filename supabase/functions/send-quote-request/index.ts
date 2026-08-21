@@ -4,6 +4,7 @@ import { z } from "https://esm.sh/zod@3.23.8";
 // Restrict CORS to production origin only
 const ALLOWED_ORIGINS = [
   "https://zapsitestudio.com",
+  "https://spiffy-manatee-d0fda6.netlify.app",
   "http://localhost:5173", // for local development
   "http://localhost:3000",  // alternative local dev port
 ];
